@@ -95,11 +95,16 @@ if (isset($_GET['store']) && $is_adminOfCourse) {
 	exit;
 }
 
-// add new line
+// add new line 
+//filter_var($data, FILTER_SANITIZE_SPEC_CHARS);
+//filter_var($chatLine, FILTER_SANITIZE_STRING);
 if (isset($chatLine) and trim($chatLine) != '') {
+	//$chatLine = filter_var($chatLine, FILTER_SANITIZE_STRING);
+	//$chatLine = stripslashes($chatLine);
+	$chatLine =  htmlspecialchars($chatLine);
 	$fchat = fopen($fileChatName,'a');
 	$chatLine = mathfilter($chatLine, 12, '../../courses/mathimg/');
-	fwrite($fchat,$timeNow.' - '.$nick.' : '.stripslashes($chatLine)."\n");
+	fwrite($fchat,$timeNow.' + '.$nick.' : '.stripslashes($chatLine)."\n");
 	fclose($fchat);
 }
 
