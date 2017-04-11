@@ -303,6 +303,7 @@ if ($is_adminOfCourse) { // course admin
 		}
 		$message = str_ireplace(array('<br>', '<br />'), "\n", $message);
 		$message = stripslashes($message);
+		$message = htmlspecialchars($message);
 		$message = bbdecode($message);
 		$message = undo_make_clickable($message);
 		$message = undo_htmlspecialchars($message);
