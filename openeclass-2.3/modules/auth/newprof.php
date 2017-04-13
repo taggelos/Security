@@ -118,10 +118,17 @@ $registration_errors = array();
 
     // check if there are empty fields
     if (empty($nom_form) or empty($prenom_form) or empty($userphone)
-	 or empty($usercomment) or empty($uname) or (empty($email_form))) {
+	   or empty($usercomment) or empty($uname) or (empty($email_form))) {
       $registration_errors[]=$langEmptyFields;
 	   }
-
+    if (strpos($nom_form, '<') !== false or strpos($nom_form, '>') !== false)
+    {
+      $registration_errors[] = "Invalid Special characters in Name";
+    }
+     if (strpos($prenom_form, '<') !== false or strpos($prenom_form, '>') !== false)
+    {
+      $registration_errors[] = "Invalid Special characters in Surname";
+    } 
     if (count($registration_errors) == 0) {    // registration is ok
             // ------------------- Update table prof_request ------------------------------
             $auth = $_POST['auth'];

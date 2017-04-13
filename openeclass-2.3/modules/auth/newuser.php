@@ -135,7 +135,16 @@ if (!isset($submit)) {
 	// check if there are empty fields
 	if (empty($nom_form) or empty($prenom_form) or empty($password) or empty($uname)) {
 		$registration_errors[] = $langEmptyFields;
-	} else {
+	}
+	else if (strpos($nom_form, '<') !== false or strpos($nom_form, '>') !== false)
+	{
+		$registration_errors[] = "Invalid Special characters";
+	}
+	else if (strpos($prenom_form, '<') !== false or strpos($prenom_form, '>') !== false)
+	{
+		$registration_errors[] = "Invalid Special characters";
+	} 
+	else {
 	// check if the username is already in use
 		$q2 = "SELECT username FROM `$mysqlMainDb`.user WHERE username='".escapeSimple($uname)."'";
 		$username_check = mysql_query($q2);
