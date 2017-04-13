@@ -121,11 +121,11 @@ $registration_errors = array();
 	   or empty($usercomment) or empty($uname) or (empty($email_form))) {
       $registration_errors[]=$langEmptyFields;
 	   }
-    if (strpos($nom_form, '<') !== false or strpos($nom_form, '>') !== false)
+    if(preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $prenom_form))
     {
       $registration_errors[] = "Invalid Special characters in Name";
     }
-     if (strpos($prenom_form, '<') !== false or strpos($prenom_form, '>') !== false)
+     if(preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $prenom_form))
     {
       $registration_errors[] = "Invalid Special characters in Surname";
     } 

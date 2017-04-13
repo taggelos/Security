@@ -136,11 +136,11 @@ if (!isset($submit)) {
 	if (empty($nom_form) or empty($prenom_form) or empty($password) or empty($uname)) {
 		$registration_errors[] = $langEmptyFields;
 	}
-	else if (strpos($nom_form, '<') !== false or strpos($nom_form, '>') !== false)
+	else if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $nom_form))
 	{
 		$registration_errors[] = "Invalid Special characters";
 	}
-	else if (strpos($prenom_form, '<') !== false or strpos($prenom_form, '>') !== false)
+	else if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $prenom_form))
 	{
 		$registration_errors[] = "Invalid Special characters";
 	} 
