@@ -469,7 +469,7 @@ function show_edit_assignment($id)
       <td>
         <table class='xinha_editor'>
         <tr>
-          <td><textarea id='xinha' name='desc' value='$description' style='width:100%'>${row['description']}</textarea></td>
+          <td><textarea id='xinha' name='desc' value='$description' style='width:100%'>$description</textarea></td>
         </tr>
         </table>
       </td>

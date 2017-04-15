@@ -48,12 +48,22 @@ if (isset($submit) && (!isset($ldap_submit)) && !isset($changePass)) {
 		$user_exist=$myusername[0];
 	}
 
+
+	if(preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $nom_form))
+    {
+     	header("location:". $_SERVER['PHP_SELF']."?msg=22");
+		exit();
+    }
+    if(preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $prenom_form))
+    {
+      header("location:". $_SERVER['PHP_SELF']."?msg=22");
+	  exit();
+    }  
 	// check if there are empty fields
 	if (empty($nom_form) OR empty($prenom_form) OR empty($username_form)) {
 		header("location:". $_SERVER['PHP_SELF']."?msg=4");
 		exit();
 	}
-
 	elseif (empty($email_form) and check_prof()) {
 		header("location:". $_SERVER['PHP_SELF']."?msg=4");
 		exit();
@@ -144,6 +154,12 @@ if(isset($msg))
 		}
 		case 6: {//email not valid
 			$message = $langEmailWrong;
+			$urlText = "";
+			$type = "caution_small";
+			break;
+		}
+		case 22: {//special chaars
+			$message ="No Special characters are permitted";
 			$urlText = "";
 			$type = "caution_small";
 			break;

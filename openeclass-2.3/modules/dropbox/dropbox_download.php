@@ -78,6 +78,7 @@ if ( !is_file( $path))
  * SEND HEADERS
  * ========================================
  */
+/*
 require_once("mime.inc.php"); 
 
 $fileparts = explode( '.', $file);
@@ -90,11 +91,11 @@ if (($filepartscount > 1) && isset($mimetype[$fileparts [$filepartscount - 1]]))
     header( "Content-Disposition: inline; filename=$file\n");
 }
 else
-{ 
+{ */
 	//no information about filetype: force a download dialog window in browser
 	header( "Content-type: application/octet-stream\n");
 	header( "Content-Disposition: inline; filename=$file\n");
-}
+//}
 
 /**
  * Note that if you use these two headers from a previous example:
