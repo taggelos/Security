@@ -70,6 +70,8 @@ if((!empty($u)) && ctype_digit($u) )	// validate the user id
 	$u = (int)$u;
 	if(empty($u_submitted)) // if the form was not submitted
 	{
+		$token = md5(uniqid(rand(), TRUE));
+    	$_SESSION['token'] = $token;
 		$sql = mysql_query("SELECT nom, prenom, username, password, email, phone, department, registered_at, expires_at, statut, am FROM user WHERE user_id = '$u'");
 		$info = mysql_fetch_array($sql);
 		$tool_content .= "
@@ -85,7 +87,8 @@ if((!empty($u)) && ctype_digit($u) )	// validate the user id
     </ul>
   </div>";
 		$tool_content .= "
-<form name='edituser' method='post' action='$_SERVER[PHP_SELF]'>
+<form name='edituser' method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."'>
+<input type=\"hidden\" name=\"token\" value=\"$token\" />
   <table class='FormData' width='99%' align='left'>
   <tbody>
   <tr>
@@ -288,6 +291,7 @@ $tool_content .= "
 		}
 	}  else { // if the form was submitted then update user
 
+		if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
 		// get the variables from the form and initialize them
 		$fname = isset($_POST['fname'])?$_POST['fname']:'';
 		$lname = isset($_POST['lname'])?$_POST['lname']:'';
@@ -321,14 +325,14 @@ if (mysql_num_rows($username_check) > 1) {
   if (empty($fname) OR empty($lname) OR empty($username)) {
 	$tool_content .= "<table width='99%'><tbody><tr>
         <td class='caution' height='60'><p>$langEmptyFields</p>
-	<p><a href='$_SERVER[PHP_SELF]'>$langAgain</a></p></td></tr></tbody></table><br /><br />";
+	<p><a href='".htmlspecialchars($_SERVER[PHP_SELF])."'>$langAgain</a></p></td></tr></tbody></table><br /><br />";
 	draw($tool_content, 3, ' ', $head_content);
 	    exit();
 	}
  	 elseif(isset($user_exist) AND $user_exist == TRUE) {
 		$tool_content .= "<table width='99%'><tbody><tr>
           	<td class='caution' height='60'><p>$langUserFree</p>
-		<p><a href='$_SERVER[PHP_SELF]'>$langAgain</a></p></td></tr></tbody></table><br /><br />";
+		<p><a href='".htmlspecialchars($_SERVER[PHP_SELF])."'>$langAgain</a></p></td></tr></tbody></table><br /><br />";
 		draw($tool_content, 3, ' ', $head_content);
 	    exit();
   }
@@ -354,7 +358,7 @@ if (mysql_num_rows($username_check) > 1) {
                         }
                         $tool_content .= "<a href='listusers.php'>$langBack</a></center>";
                 }
-	}
+	}}
 }
 else
 {

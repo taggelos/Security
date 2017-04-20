@@ -75,6 +75,8 @@ if (isset($search) && ($search=="yes")) {
 }
 // Update course status
 if (isset($submit))  {
+
+	if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
   // Update query
 	$sql = mysql_query("UPDATE cours SET visible='$formvisible' WHERE code='".mysql_real_escape_string($_GET['c'])."'");
 	// Some changes occured
@@ -86,15 +88,19 @@ if (isset($submit))  {
 		$tool_content .= "<p>".$langNoChangeHappened."</p>";
 	}
 
-}
+}}
 // Display edit form for course status
 else {
+	$token = md5(uniqid(rand(), TRUE));
+    $_SESSION['token'] = $token;
 	// Get course information
 	$row = mysql_fetch_array(mysql_query("SELECT * FROM cours WHERE code='".mysql_real_escape_string($_GET['c'])."'"));
 	$visible = $row['visible'];
 	$visibleChecked[$visible]="checked";
 	// Constract edit form
-	$tool_content .= "<form action=".$_SERVER['PHP_SELF']."?c=".htmlspecialchars($_GET['c'])."".$searchurl." method=\"post\">
+	$tool_content .= "<form action=".htmlspecialchars($_SERVER['PHP_SELF'])."?c=".htmlspecialchars($_GET['c'])."".$searchurl." method=\"post\">
+	
+	<input type=\"hidden\" name=\"token\" value=\"$token\" />
 	<table class=\"FormData\" width=\"99%\" align=\"left\">
 	<tbody>
 	<tr><th width=\"220\">&nbsp;</th>

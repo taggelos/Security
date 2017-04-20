@@ -51,44 +51,45 @@ if (isset($submit) && (!isset($ldap_submit)) && !isset($changePass)) {
 
 	if(preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $nom_form))
     {
-     	header("location:". $_SERVER['PHP_SELF']."?msg=22");
+     	header("location:". htmlspecialchars($_SERVER['PHP_SELF'])."?msg=22");
 		exit();
     }
     if(preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $prenom_form))
     {
-      header("location:". $_SERVER['PHP_SELF']."?msg=22");
+      header("location:". htmlspecialchars($_SERVER['PHP_SELF'])."?msg=22");
 	  exit();
     }  
 	// check if there are empty fields
 	if (empty($nom_form) OR empty($prenom_form) OR empty($username_form)) {
-		header("location:". $_SERVER['PHP_SELF']."?msg=4");
+		header("location:". htmlspecialchars($_SERVER['PHP_SELF'])."?msg=4");
 		exit();
 	}
 	elseif (empty($email_form) and check_prof()) {
-		header("location:". $_SERVER['PHP_SELF']."?msg=4");
+		header("location:". htmlspecialchars($_SERVER['PHP_SELF'])."?msg=4");
 		exit();
 	}
 
 	elseif (strstr($username_form, "'") or strstr($username_form, '"') or strstr($username_form, '\\')){
-		header("location:". $_SERVER['PHP_SELF']."?msg=10");
+		header("location:". htmlspecialchars($_SERVER['PHP_SELF'])."?msg=10");
 		exit();
 	}
 
 	// check if username is free
 	elseif(isset($user_exist) AND ($username_form==$user_exist) AND ($username_form!=$uname)) {
-		header("location:". $_SERVER['PHP_SELF']."?msg=5");
+		header("location:". htmlspecialchars($_SERVER['PHP_SELF'])."?msg=5");
 		exit();
 	}
 
 	// check if email is valid
 	elseif (!email_seems_valid($email_form) and check_prof()) {
-		header("location:". $_SERVER['PHP_SELF']."?msg=6");
+		header("location:". htmlspecialchars($_SERVER['PHP_SELF'])."?msg=6");
 		exit();
 	}
 
 	// everything is ok
 	else {
 		##[BEGIN personalisation modification]############
+		if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
 		$_SESSION['langswitch'] = $language = langcode_to_name($_REQUEST['userLanguage']);
 		$langcode = langname_to_code($language);
 
@@ -101,9 +102,10 @@ if (isset($submit) && (!isset($ldap_submit)) && !isset($changePass)) {
 			if (isset($_SESSION['user_perso_active']) and $persoStatus == "no") {
                 		unset($_SESSION['user_perso_active']);
 			}
-			header("location:". $_SERVER['PHP_SELF']."?msg=1");
+			header("location:". htmlspecialchars($_SERVER['PHP_SELF'])."?msg=1");
 			exit();
 	        }
+	    }
 	}
 }	// if submit
 
@@ -119,7 +121,7 @@ if (isset($submit) && isset($ldap_submit) && ($ldap_submit == "ON")) {
 		unset($_SESSION['user_perso_active']);
 	}
 
-	header("location:". $_SERVER['PHP_SELF']."?msg=1");
+	header("location:". htmlspecialchars($_SERVER['PHP_SELF'])."?msg=1");
 	exit();
 }
 ##[END personalisation modification]############
@@ -227,6 +229,9 @@ $passurl = $urlSecure.'modules/profile/password.php';
 $authmethods = array("imap","pop3","ldap","db","shibboleth");
 
 if ((!isset($changePass)) || isset($_POST['submit'])) {
+	$token = md5(uniqid(rand(), TRUE));
+    $_SESSION['token'] = $token;
+
 	$tool_content .= "<div id=\"operations_container\"><ul id=\"opslist\">";
 	if(!in_array($password_form,$authmethods)) {
 		$tool_content .= "<li><a href=\"".$passurl."\">".$langChangePass."</a></li>";
@@ -237,7 +242,7 @@ if ((!isset($changePass)) || isset($_POST['submit'])) {
     <table width=\"99%\">
     <tbody><tr>
        <th width=\"220\" class='left'>$langName</th>";
-
+    $tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" />";//csrf
 	if (isset($_SESSION['shib_user'])) {
                 $auth_text = "Shibboleth user";
 		$tool_content .= "<td class=\"caution_small\">&nbsp;&nbsp;&nbsp;&nbsp;<b>".$prenom_form."</b> [".$auth_text."]

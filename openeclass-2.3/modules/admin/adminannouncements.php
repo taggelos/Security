@@ -70,12 +70,17 @@ foreach (array('title', 'title_en', 'newContent', 'newContent_en', 'comment', 'c
 }
 $visible = isset($_POST['visible'])? 'V': 'I';
 
-if (isset($_GET['delete'])) {
+if (isset($_GET['delete']) && isset($_SESSION['token']) && $_POST['token']==$_SESSION['token'] ) {
         // delete announcement command
+        if( isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
         $id = intval($_GET['delete']);
         $result =  db_query("DELETE FROM admin_announcements WHERE id='$id'", $mysqlMainDb);
         $message = $langAdminAnnDel;
-} elseif (isset($_GET['modify'])) {
+        }else {
+            echo 'axne';
+            echo $_SESSION['token'];
+        }
+} elseif (isset($_GET['modify']) && isset($_SESSION['token']) && $_POST['token']==$_SESSION['token'] ) {
         // modify announcement command
         $id = intval($_GET['modify']);
         $result = db_query("SELECT * FROM admin_announcements WHERE id='$id'", $mysqlMainDb);
@@ -92,7 +97,7 @@ if (isset($_GET['delete'])) {
                 $visibleToModify = $myrow['visible'];
                 $displayAnnouncementList = true;
         }
-} elseif (isset($_POST['submitAnnouncement'])) {
+} elseif (isset($_POST['submitAnnouncement']) && isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']) {
 	// submit announcement command
         if (isset($_POST['id'])) {
                 // modify announcement
@@ -110,7 +115,7 @@ if (isset($_GET['delete'])) {
                         en_title = $title_en, en_body = $newContent_en, en_comment = $comment_en,
                         visible = '$visible', date = NOW()");
                 $message = $langAdminAnnAdd;
-        }
+        }        
 }
 
 // action message
@@ -124,7 +129,8 @@ if (isset($message) && !empty($message)) {
 if ($displayForm && (@$addAnnouce==1 || isset($modify))) {
         $displayAnnouncementList = false;
         // display add announcement command
-        $tool_content .= "<form method='post' action='$_SERVER[PHP_SELF]?localize=$localize'>";
+        $tool_content .= "<form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."?localize=$localize'>";
+        $tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" />";
         $tool_content .= "<table width='99%' class='FormData' align='left'><tbody>
                 <tr><th width='220'>&nbsp;</th><td><b>";
         if (isset($modify)) {
@@ -135,7 +141,7 @@ if ($displayForm && (@$addAnnouce==1 || isset($modify))) {
         $tool_content .= "</b></td></tr>";
 
         if (!isset($contentToModify))	$contentToModify ="";
-        if (!isset($titleToModify))	$titleToModify ="";
+        if (!isset($titleToModify))	    $titleToModify ="";
         if (!isset($commentToModify))	$commentToModify ="";
         // english
         if (!isset($contentToModifyEn))	$contentToModifyEn ="";
@@ -179,12 +185,25 @@ if ($displayForm && (@$addAnnouce==1 || isset($modify))) {
 
 // display admin announcements
 if ($displayAnnouncementList == true) {
+        $token = md5(uniqid(rand(), TRUE));
+        $_SESSION['token'] = $token;
+        $_SESSION['token_time'] = time();
+        
         $result = db_query("SELECT * FROM admin_announcements ORDER BY id DESC", $mysqlMainDb);
         $announcementNumber = mysql_num_rows($result);
         if (@$addAnnouce != 1) {
                 $tool_content .= "<div id='operations_container'>
                 <ul id='opslist'><li>";
-                $tool_content .= "<a href='".$_SERVER['PHP_SELF']."?addAnnouce=1&amp;localize=$localize'>".$langAdminAddAnn."</a>";
+
+                $tool_content .=  "<form action='".htmlspecialchars($_SERVER[PHP_SELF])."?addAnnouce=1&amp;localize=$localize' method=\"post\">";
+                //.htmlspecialchars($u).
+
+                //$tool_content .= "<input type=\"image\" src='../../images/delete.gif' border='0' title='$langDelete' />";
+                $tool_content .= "<input type=\"submit\" value=\"$langAdminAddAnn\">";
+                $tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" />";
+                $tool_content .= "</form>";
+
+               // $tool_content .= "<a href='".htmlspecialchars($_SERVER['PHP_SELF'])."?addAnnouce=1&amp;localize=$localize'>".$langAdminAddAnn."</a>";
                 $tool_content .= "</li></ul></div>";
         }
         if ($announcementNumber > 0) {
@@ -202,13 +221,32 @@ if ($displayAnnouncementList == true) {
                 }
                 $tool_content .=  "<tr class='odd' $stylerow>
                 <td colspan='3' class='right'>(".$langAdminAnnMes." <b>".nice_format($myrow['date'])."</b>)
-                &nbsp;&nbsp;
-                <a href='$_SERVER[PHP_SELF]?modify=$myrow[id]&amp;localize=$localize'>
+                &nbsp;&nbsp;";
+
+                $tool_content .=  "<form action='".htmlspecialchars($_SERVER[PHP_SELF])."?modify=$myrow[id]&amp;localize=$localize' method=\"post\">";
+                //.htmlspecialchars($u).
+
+                $tool_content .= "<input type=\"image\" src='../../template/classic/img/edit.gif'  title='$langModify' style='vertical-align:middle;' />";
+                //$tool_content .= "<input type=\"submit\" value=\"$langAdminAddAnn\">";
+                $tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" />";
+                $tool_content .= "</form>";
+
+                /*$tool_content .= "<a href='".htmlspecialchars($_SERVER[PHP_SELF])."?modify=$myrow[id]&amp;localize=$localize'>
                 <img src='../../template/classic/img/edit.gif' title='$langModify' style='vertical-align:middle;' />
-                </a>&nbsp;
-                <a href='$_SERVER[PHP_SELF]?delete=$myrow[id]&amp;localize=$localize' onClick='return confirmation();'>
+                </a>&nbsp;";*/
+
+                $tool_content .=  "<form action='".htmlspecialchars($_SERVER[PHP_SELF])."?delete=$myrow[id]&amp;localize=$localize' onClick='return confirmation();' method=\"post\">";
+                //.htmlspecialchars($u).
+
+                $tool_content .= "<input type=\"image\" src='../../images/delete.gif'  title='$langDelete' style='vertical-align:middle;' />";
+                //$tool_content .= "<input type=\"submit\" value=\"$langAdminAddAnn\">";
+                $tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" />";
+                $tool_content .= "</form></td></tr>";
+
+                /*$tool_content .="
+                <a href='".htmlspecialchars($_SERVER[PHP_SELF])."?delete=$myrow[id]&amp;localize=$localize' onClick='return confirmation();'>
                 <img src='../../images/delete.gif' title='$langDelete' style='vertical-align:middle;' /></a>
-                </td></tr>";
+                </td></tr>";*/
                 $tool_content .= "<tr $stylerow>";
                 // title
                 $tool_content .= "<th class='left'>$langTitle:</th>";

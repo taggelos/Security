@@ -31,10 +31,25 @@ $navigation[]= array ("url"=>"../profile/profile.php", "name"=> $langModifProfil
 
 $tool_content = "";
 
+/*if (!isset($_SESSION['token'])) {
+    $token = md5(uniqid(rand(), TRUE));
+    $_SESSION['token'] = $token;
+    $_SESSION['token_time'] = time();
+}
+else
+{
+    $token = $_SESSION['token'];
+}
+echo $_SESSION['token'];*/
+
 if (!isset($doit) or $doit != "yes") {
 	$tool_content .=  "<table width=99%><tbody>";
 	$tool_content .=  "<tr><td class=\"caution\">";
 
+	$token = md5(uniqid(rand(), TRUE));
+    $_SESSION['token'] = $token;
+    $_SESSION['token_time'] = time();
+	//echo $token;
 	// admin cannot be deleted
 	if ($is_admin) {
 		$tool_content .=  "<p><b>$langAdminNo</b></p>";
@@ -48,7 +63,13 @@ if (!isset($doit) or $doit != "yes") {
 			$tool_content .=  "<p><b>$langConfirm</b></p>";
 			$tool_content .=  "<ul class=\"listBullet\">";
 			$tool_content .=  "<li>$langYes: ";
-			$tool_content .=  "<a href='$_SERVER[PHP_SELF]?u=$uid&doit=yes'>$langDelete</a>";
+			//$tool_content .=  "<a href='".htmlspecialchars($_SERVER[PHP_SELF])."?u=$uid&doit=yes'>$langDelete</a>";
+			$tool_content .=  "<form action='".htmlspecialchars($_SERVER[PHP_SELF])."?u=$uid&doit=yes'  method=\"post\">";
+			//.htmlspecialchars($u).
+
+			$tool_content .= "<input type=\"submit\" value=\"$langDelete\">";
+			$tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" />";
+			$tool_content .= "</form>";
 			$tool_content .=  "</li>";
 			$tool_content .=  "<li>$langNo: <a href='../profile/profile.php'>$langBack</a>";
 			$tool_content .=  "</li></ul>";
@@ -62,16 +83,21 @@ if (!isset($doit) or $doit != "yes") {
 	}  //endif is admin
 } else {
 	if (isset($uid)) {
+		
+		//$token = $_SESSION['token'];
+		//unset($_SESSION['token']);
+
 		$tool_content .=  "<table width=99%><tbody>";
 		$tool_content .=  "<tr>";
 		$tool_content .=  "<td class=\"success\">";
-		db_query("DELETE from user WHERE user_id = '$uid'");
-		if (mysql_affected_rows() > 0) {
+		if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
+			db_query("DELETE from user WHERE user_id = '$uid'");
 			$tool_content .=  "<p><b>$langDelSuccess</b></p>";
 			$tool_content .=  "<p>$langThanks</p>";
 			$tool_content .=  "<br><a href='../../index.php?logout=yes'>$langLogout</a>";
 			unset($_SESSION['uid']);
-		} else {
+		}
+		else {
 			$tool_content .=  "<p>$langError</p>";
 			$tool_content .=  "<p><a href='../profile/profile.php'>$langBack</a></p><br>";
 			//			exit;

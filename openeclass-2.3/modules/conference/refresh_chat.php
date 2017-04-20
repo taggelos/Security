@@ -75,7 +75,7 @@ if (!file_exists($fileChatName)) {
 
 if (isset($_POST['reset']) && $is_adminOfCourse) {
         $fchat = fopen($fileChatName,'w');
-        fwrite($fchat, $timeNow." -33- ".$langWashFrom." -33- ".$nick." --------\n");
+        fwrite($fchat, $timeNow." ---- ".$langWashFrom." ---- ".$nick." --------\n");
         fclose($fchat);
         @unlink($tmpArchiveFile);
 }
@@ -104,7 +104,7 @@ if (isset($_POST['store']) && $is_adminOfCourse) {
 if (isset($chatLine)) {
 	$chatLine=uft8html2utf8(utf8RawUrlDecode($chatLine));
         $fchat = fopen($fileChatName,'a');
-        fwrite($fchat,$timeNow.' + '.$nick.' 00 '.stripslashes($chatLine)."\n");
+        fwrite($fchat,$timeNow.' - '.$nick.' : '.stripslashes($chatLine)."\n");
         fclose($fchat);
 }
 

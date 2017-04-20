@@ -44,7 +44,7 @@ $tool_content = "";
 $version = 1;
 $encoding = 'ISO-8859-7';
 
-if (isset($send_archive) and $_FILES['archiveZipped']['size'] > 0) {
+if (isset($send_archive) and $_FILES['archiveZipped']['size'] > 0 && (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']))  {
 	$tool_content .= "<table width='99%'><caption>".$langFileSent."</caption><tbody>
 	<tr><td width='3%'>$langFileSentName</td><td>".$_FILES['archiveZipped']['name']."</td></tr>
 	<tr><td width='3%'>$langFileSentSize</td><td>".$_FILES['archiveZipped']['size']."</td></tr>
@@ -54,7 +54,7 @@ if (isset($send_archive) and $_FILES['archiveZipped']['size'] > 0) {
 	$tool_content .= "<table width='99%'><caption>".$langFileUnzipping."</caption><tbody>";
 	$tool_content .= "<tr><td>".unpack_zip_show_files($archiveZipped)."</td></tr>";
 	$tool_content .= "<tbody></table><br />";
-} elseif (isset($_POST['send_path']) and isset($_POST['pathToArchive'])) {
+} elseif (isset($_POST['send_path']) and isset($_POST['pathToArchive']) && (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token'])) {
         $pathToArchive = $_POST['pathToArchive'];
 	if (file_exists($pathToArchive)) {
 		$tool_content .= "<table width='99%'><caption>".$langFileUnzipping."</caption><tbody>";
@@ -63,7 +63,7 @@ if (isset($send_archive) and $_FILES['archiveZipped']['size'] > 0) {
 	} else {
 		$tool_content .= $langFileNotFound;
 	}
-} elseif (isset($create_dir_for_course)) {
+} elseif (isset($create_dir_for_course) && (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token'])) {
 	$r = $restoreThis."/html";
 	list($new_course_code, $new_course_id) = create_course($course_code, $course_lang, $course_title,
 		$course_desc, intval($course_fac), $course_vis, $course_prof, $course_type);
@@ -97,7 +97,7 @@ if (isset($send_archive) and $_FILES['archiveZipped']['size'] > 0) {
 	$tool_content .= "<br /><center><p><a href='../admin/index.php'>$langBack</p></center>";
 }
 
-elseif (isset($_POST['pathOf4path'])) {
+elseif (isset($_POST['pathOf4path']) && (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token'])) {
 	// we know where is the 4 paths to restore  the  course.
 	// 2 Show content
 	// $_POST['restoreThis']: contains the path of the archived course
@@ -114,11 +114,14 @@ elseif (isset($_POST['pathOf4path'])) {
 // -------------------------------------
 // Displaying Form
 // -------------------------------------
+	$token = md5(uniqid(rand(), TRUE));
+    $_SESSION['token'] = $token;
 	$tool_content .= "<table width='99%' class='FormData'>
 	<tbody><tr><th>&nbsp;</th><td><b>$langFirstMethod</b></td></tr>
 	<tr><th>&nbsp;</th><td>$langRequest1
 	<br /><br />
-	<form action='".$_SERVER['PHP_SELF']."' method='post' name='sendZip' enctype='multipart/form-data'>
+	<form action='".htmlspecialchars($_SERVER['PHP_SELF'])."' method='post' name='sendZip' enctype='multipart/form-data'>
+	<input type=\"hidden\" name=\"token\" value=\"$token\" />
 	<input type='file' name='archiveZipped' />
 	<input type='submit' name='send_archive' value='".$langSend."' />
 	</form>
@@ -132,9 +135,10 @@ elseif (isset($_POST['pathOf4path'])) {
 	<th>&nbsp;</th>
 	<td>$langRequest2
 	<br /><br />
-	<form action='".$_SERVER['PHP_SELF']."' method='post'>
+	<form action='".htmlspecialchars($_SERVER['PHP_SELF'])."' method='post'>
 	<input type='text' name='pathToArchive' />
-	<input type='submit' name='send_path' value='".$langSend."' />
+	<input type='submit' name='send_path' value='".$langSend."' />	
+	<input type=\"hidden\" name=\"token\" value=\"$token\" />
 	</form>
 	</td></tr>
 	</tbody></table><br />";
@@ -181,7 +185,7 @@ function course_details($code, $lang, $title, $desc, $fac, $vis, $prof, $type) {
 
         // display the restoring form
 	if (!$action) {
-		echo "<form action='$_SERVER[PHP_SELF]' method='post'>";
+		echo "<form action='".htmlspecialchars($_SERVER[PHP_SELF])."' method='post'>";
   		echo "<table width='99%' class='FormData'><tbody>";
 		echo "<tr><td align='justify' colspan='2'>$langInfo1</td></tr>";
 		echo "<tr><td align='justify' colspan='2'>$langInfo2</td></tr>";
@@ -547,7 +551,7 @@ function unpack_zip_show_files($zipfile)
 			continue;
 		if (is_dir($dirnameCourse.$entries))
 			$retString .= "<li>".$entries."<br />".$langLesFiles."
-			<form action='".$_SERVER['PHP_SELF']."' method='post' name='restoreThis'>
+			<form action='".htmlspecialchars($_SERVER['PHP_SELF'])."' method='post' name='restoreThis'>
 			<ol>";
 			$dirnameArchive = realpath("$destdir/archive/$entries/");
 			if($dirnameArchive[strlen($dirnameArchive)-1]!='/')

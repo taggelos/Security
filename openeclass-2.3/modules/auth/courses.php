@@ -58,6 +58,8 @@ if (isset($_POST['selectCourse']) and is_array($_POST['selectCourse'])) {
 }
 
 if (isset($_POST["submit"])) {
+
+        if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
         foreach ($changeCourse as $key => $value) {
                 $cid = intval($value);
                 if (!in_array($cid, $selectCourse)) {
@@ -101,7 +103,7 @@ if (isset($_POST["submit"])) {
         }
         $tool_content .= "<div align=right><a href='../../index.php'>$langHome</a></div>";
 
-} else {
+}} else {
         $fac = getfacfromfc($fc);
 	if (!$fac) {
 		$tool_content .= "
@@ -144,13 +146,17 @@ if (isset($_POST["submit"])) {
 		$tool_content .= collapsed_facultes_horiz($fc);
 		$tool_content .= "\n    <form action='".htmlspecialchars($_SERVER[PHP_SELF])."' method='post'>";
 		if ($numofcourses > 0) {
+            $token = md5(uniqid(rand(), TRUE));
+            $_SESSION['token'] = $token;
 			$tool_content .= expanded_faculte($fac, $fc, $uid);
 			$tool_content .= "
     <br />
     <table width='99%' class='framed' align='left'>
     <tbody>
     <tr>
-      <td><input class='Login' type='submit' name='submit' value='$langRegistration' /></td>
+      <td><input class='Login' type='submit' name='submit' value='$langRegistration' />
+      <input type='hidden' name='token' value='$token' />
+      </td>
     </tr>
     </tbody>
     </table>

@@ -1,0 +1,13 @@
+<iframe src="http://dimitro.gr" name="dm" style="height:400px"></iframe>
+
+<script> alert("sadfasd");</script>
+
+<script> document.getElementsByName('dm')[0].onload=function() {
+	try{
+		alert(frames[0].location);
+	}catch(e){
+		alert("Error" + e);
+	}
+
+}
+	</script>

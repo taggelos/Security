@@ -54,6 +54,10 @@ foreach ($native_language_names as $code => $name) {
         }
         $global_messages['langCourseUnits'][$templang] = $langCourseUnits;
 }
+$mylang = array("greek","english","spanish");
+if(!in_array($language, $mylang)){
+    $language = "greek";
+}
 // include_messages
 include("${webDir}modules/lang/$language/common.inc.php");
 $extra_messages = "${webDir}/config/$language.inc.php";

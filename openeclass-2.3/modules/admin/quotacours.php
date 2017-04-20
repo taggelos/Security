@@ -78,7 +78,8 @@ if (isset($search) && ($search=="yes")) {
 	$searchurl = "&search=yes";
 }
 // Update course quota
-if (isset($submit))  {
+if (isset($submit))  {  
+  if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
 	$dq = $dq * 1000000;
         $vq = $vq * 1000000;
         $gq = $gq * 1000000;
@@ -94,9 +95,11 @@ if (isset($submit))  {
 		$tool_content .= "<p>".$langQuotaFail."</p>";
 	}
 
-}
+}}
 // Display edit form for course quota
 else {
+  $token = md5(uniqid(rand(), TRUE));        
+  $_SESSION['token'] = $token;
 	// Get course information
 	$q = mysql_fetch_array(mysql_query("SELECT code,intitule,doc_quota,video_quota,group_quota,dropbox_quota
 			FROM cours WHERE code='".mysql_real_escape_string($_GET['c'])."'"));
@@ -107,8 +110,10 @@ else {
 	$drq = $q['dropbox_quota'] / 1000000;
 	// Constract the edit form
 	$tool_content .= "
-<form action=".$_SERVER['PHP_SELF']."?c=".htmlspecialchars($_GET['c'])."".$searchurl." method=\"post\">
-  <table class=\"FormData\" width=\"99%\" align=\"left\">
+<form action=".htmlspecialchars($_SERVER['PHP_SELF'])."?c=".htmlspecialchars($_GET['c'])."".$searchurl." method=\"post\">
+ 
+<input type=\"hidden\" name=\"token\" value=\"$token\" />
+ <table class=\"FormData\" width=\"99%\" align=\"left\">
   <tbody>
   <tr>
     <th width=\"220\">&nbsp;</th>

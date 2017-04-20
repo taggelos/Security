@@ -13,5 +13,5 @@ if (isset($_SESSION['dbname'])) {
 	$_SESSION['status'][$_SESSION['dbname']] = $_SESSION['statut'];
         header("Location: {$urlServer}courses/$_SESSION[dbname]/");
 } else {
-        header('Location: ' . $urlServer);
+        header('Location: ' . htmlspecialchars($urlServer) );
 }

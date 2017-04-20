@@ -238,6 +238,9 @@ function add_assignment($title, $comments, $desc, $deadline, $group_submissions)
 	global $tool_content, $workPath;
 
 	$secret = uniqid("");
+	$title=htmlspecialchars($title);
+	$desc=htmlspecialchars($desc);
+	$comments=htmlspecialchars($comments);
 	db_query("INSERT INTO assignments
 		(title, description, comments, deadline, submission_date, secret_directory,
 			group_submissions) VALUES
@@ -450,6 +453,7 @@ function show_edit_assignment($id)
 
 
 	$description = q($row['description']);
+	//$description=htmlspecialchars($description);
 	$tool_content .= <<<cData
     <form action="$_SERVER[PHP_SELF]" method="post" onsubmit="return checkrequired(this, 'title');">
     <input type="hidden" name="id" value="$id" />
@@ -528,11 +532,17 @@ function edit_assignment($id)
 	$nav[] = array("url"=>"work.php", "name"=> $langWorks);
 	$nav[] = array("url"=>"work.php?id=$id", "name"=> $_POST['title']);
 
-	if (db_query("UPDATE assignments SET title=".autoquote($_POST['title']).",
-		description=".autoquote($_POST['desc']).", group_submissions=".autoquote($_POST['group_submissions']).",
-		comments=".autoquote($_POST['comments']).", deadline=".autoquote($_POST['WorkEnd'])." WHERE id='$id'")) {
+	$title=$_POST['title'];
+	$title=htmlspecialchars($title);
+	$desc=$_POST['desc'];
+	$desc=htmlspecialchars($desc);
+	$comments=$_POST['comments'];
+	$comments=htmlspecialchars($comments);
+	if (db_query("UPDATE assignments SET title=".autoquote($title).",
+		description=".autoquote($desc).", group_submissions=".autoquote($_POST['group_submissions']).",
+		comments=".autoquote($comments).", deadline=".autoquote($_POST['WorkEnd'])." WHERE id='$id'")) {
 
-        $title = autounquote($_POST['title']);
+        $title = autounquote($title);
 	$tool_content .="<p class='success_small'>$langEditSuccess<br /><a href='work.php?id=$id'>$langBackAssignment '$title'</a></p><br />";
 	} else {
 	$tool_content .="<p class='caution_small'>$langEditError<br /><a href='work.php?id=$id'>$langBackAssignment '$title'</a></p><br />";

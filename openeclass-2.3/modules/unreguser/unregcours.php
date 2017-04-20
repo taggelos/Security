@@ -39,7 +39,9 @@ if(!isset($_GET['cid']))
   $cid=$_SESSION['cid_tmp'];
 
 if (!isset($doit) or $doit != "yes") {
-
+  $token = md5(uniqid(rand(), TRUE));
+  $_SESSION['token'] = $token;
+  $_SESSION['token_time'] = time();
   $tool_content .= "
     <table width='40%'>
     <tbody>
@@ -47,9 +49,16 @@ if (!isset($doit) or $doit != "yes") {
       <td class='caution_NoBorder' height='60' colspan='2'>
       	<p>$langConfirmUnregCours:</p><p> <em>".course_code_to_title($cid)."</em>&nbsp;? </p>
 	<ul class='listBullet'>
-	<li>$langYes: 
-	<a href='$_SERVER[PHP_SELF]?u=$uid&amp;cid=$cid&amp;doit=yes' class=mainpage>$langUnregCours</a>
-	</li>
+	<li>$langYes: ";
+  $tool_content .=  "<form action='".htmlspecialchars($_SERVER[PHP_SELF])."?u=$uid&amp;cid=$cid&amp;doit=yes' class=mainpage  method=\"post\">";
+      //.htmlspecialchars($u).
+
+  $tool_content .= "<input type=\"submit\" value=\"$langUnregCours\">";
+  $tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" />";
+  $tool_content .= "</form>";
+  $tool_content .=  "</li>";
+  
+  $tool_content .= "</li>
 	<li>$langNo: <a href='../../index.php' class=mainpage>$langBack</a>
 	</li></ul>
       </td>
@@ -59,12 +68,14 @@ if (!isset($doit) or $doit != "yes") {
 
 } else {
 if (isset($uid) and $uid==$_SESSION['uid']) {
+            if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
             db_query("DELETE from cours_user WHERE cours_id = (SELECT cours_id FROM cours WHERE code = " . quote($cid) . ") AND user_id='$uid'");
                 if (mysql_affected_rows() > 0) {
                         $tool_content .= "<p class='success_small'>$langCoursDelSuccess</p>";
                 } else {
                         $tool_content .= "<p class='caution_small'>$langCoursError</p>";
                 }
+            }
          }
         $tool_content .= "<br><br><div align=right><a href='../../index.php' class=mainpage>$langBack</a></div>";
 }

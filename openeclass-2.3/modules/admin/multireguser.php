@@ -21,6 +21,7 @@ $error = '';
 $acceptable_fields = array('first', 'last', 'email', 'id', 'phone', 'username');
 
 if (isset($_POST['submit'])) {
+        if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
         $send_mail = isset($_POST['send_mail']) && $_POST['send_mail'];
         $unparsed_lines = '';
         $new_users_info = array();
@@ -106,13 +107,16 @@ if (isset($_POST['submit'])) {
                 $tool_content .= "<tr><td>$n[1]</td><td>$n[2]</td><td>$n[3]</td><td>$n[4]</td><td>$n[5]</td><td>$n[6]</td><td>$n[7]</td></tr>\n";
         }
         $tool_content .= "</table>\n";
-} else {
+}} else {
         $req = db_query("SELECT id, name FROM faculte order by id");
         while ($n = mysql_fetch_array($req)) {
                 $facs[$n['id']] = $n['name'];
         }
+        $token = md5(uniqid(rand(), TRUE));
+        $_SESSION['token'] = $token;
         $tool_content .= "$langMultiRegUserInfo
-<form method='post' action='$_SERVER[PHP_SELF]'>
+<form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."'>
+<input type=\"hidden\" name=\"token\" value=\"$token\" />
 <table class='FormData'>
 <tr><th>$langMultiRegFields</th>
     <td><input type='text' name='fields' size='50' value='first last id email phone' /></td>

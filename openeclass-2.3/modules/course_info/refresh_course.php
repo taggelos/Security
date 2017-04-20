@@ -51,6 +51,7 @@ if (!$is_adminOfCourse)
 }
 
 if(isset($submit)) {
+	if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
 	$output = array();
 	mysql_select_db($mysqlMainDb);
 	if (isset($delusers))
@@ -80,12 +81,13 @@ if(isset($submit)) {
 
 
 	$tool_content .="<p align=\"right\"><a href='infocours.php'>$langBack</a></p>";
-
+	}
 } else {
-
+	$token = md5(uniqid(rand(), TRUE));
+    $_SESSION['token'] = $token;
 	$tool_content .= "
 <form action='refresh_course.php' method='post'>
-
+	<input type=\"hidden\" name=\"token\" value=\"$token\" />
     <table width=\"99%\" class=\"FormData\">
     <tbody>
     <tr>

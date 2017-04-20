@@ -58,15 +58,26 @@ $u_statut = get_uid_statut($u);
 $t = 0;
 
 if (!$doit) {
+        $token = md5(uniqid(rand(), TRUE));
+        $_SESSION['token'] = $token;
         $tool_content .= "<h4>$langConfirmDelete</h4><p>$langConfirmDeleteQuestion1 <em>$u_realname ($u_account)</em>";
         if($c) {
                 $tool_content .= " $langConfirmDeleteQuestion2 <em>".htmlspecialchars($c)."</em>";
         }
         $tool_content .= ";</p>
                 <ul>
-                <li>$langYes: <a href=\"unreguser.php?u=".htmlspecialchars($u)."&c=".htmlspecialchars($c)."&doit=yes\">$langDelete</a><br>&nbsp;</li>
-                <li>$langNo: <a href=\"edituser.php?u=".htmlspecialchars($u)."\">$langBack</a></li>
-                </ul>";
+                <li>$langYes: 
+                ";
+
+        $tool_content .=  "<form action='unreguser.php?u=".htmlspecialchars($u)."&c=".htmlspecialchars($c)."&doit=yes' method=\"post\">";
+        //.htmlspecialchars($u).
+
+        $tool_content .= "<input type=\"submit\" value=\"$langDelete\">";
+        //$tool_content .= "<input type=\"submit\" value=\"$langDelete\">";
+        $tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" />";
+        $tool_content .= "</form>";
+
+        $tool_content .= "<li>$langNo: <a href=\"edituser.php?u=".htmlspecialchars($u)."\">$langBack</a></li></ul>";
 } else {
         if (!$c) {
                 if ($u == 1) {
@@ -179,12 +190,14 @@ if (!$doit) {
                                 }
                                 $t = 1;
                         } else {
+                            if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
                                 $q = db_query("DELETE from user WHERE user_id = " . intval($u));
                                 if ($q and mysql_affected_rows() > 0) {
                                         $t = 2;
                                 } else {
                                         $t = 3;
                                 }
+                            }
                         }
 
 

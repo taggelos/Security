@@ -72,10 +72,13 @@ while ($numrows=mysql_fetch_array($result_numb)) {
 $nameTools = $langAdminUsers;
 $tool_content = "";
 
+
+
+
 // IF PROF ONLY
 if ($is_adminOfCourse) {
-
         // Handle user removal / status change
+        if (isset($_SESSION['tokenedit']) && $_POST['tokenedit']==$_SESSION['tokenedit']){
         if (isset($_GET['giveAdmin'])) {
                 $new_admin_gid = intval($_GET['giveAdmin']);
                 db_query("UPDATE cours_user SET statut = 1
@@ -96,7 +99,7 @@ if ($is_adminOfCourse) {
                 db_query("UPDATE cours_user SET tutor = 0
                                 WHERE user_id = $removed_tutor_gid AND
                                       cours_id = $cours_id", $mysqlMainDb);
-        } elseif (isset($_GET['unregister'])) {
+        } elseif (isset($_GET['unregister'])) {            
                 $unregister_gid = intval($_GET['unregister']);
                 $unregister_ok = true;
                 // Security: don't remove myself except if there is another prof
@@ -118,7 +121,7 @@ if ($is_adminOfCourse) {
                                         WHERE user = $unregister_gid", $currentCourseID);
                 }
         }
-
+}
         // show help link and link to Add new user, search new user and management page of groups
 	$tool_content .= "<table width='99%' align='left' class='Users_Operations'><thead>
 	<tr>
@@ -179,7 +182,7 @@ if ($countUser >= $endList) {
    <thead>
    <tr>
      <td valign='bottom' align='left' width='20%'>
-       <form method='post' action='$_SERVER[PHP_SELF]?numbList=begin'>
+       <form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."?numbList=begin'>
          <input type='submit' value='<< $langBegin' name='numbering' class='auth_input' />
        </form>
      </td>
@@ -188,14 +191,14 @@ if ($countUser >= $endList) {
 	// if beginning of list or complete listing, do not show "previous" button
 	if ($startList!=0) {
 		$tool_content .= "
-       <form method='post' action='$_SERVER[PHP_SELF]?startList=$startList&amp;numbList=less'>
+       <form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."?startList=$startList&amp;numbList=less'>
          <div align='center'><input type='submit' value='< $langPreced50 $endList' name='numbering' class='auth_input' /></div>
        </form>";
 	}
 	$tool_content .= "
      </td>
      <td valign='bottom' align='center' width='20%'>
-       <form method='post' action='$_SERVER[PHP_SELF]?startList=$startList&amp;numbList=all'>
+       <form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."?startList=$startList&amp;numbList=all'>
          <div align='center'><input type='submit' value='$langAll' name=numbering class='auth_input' /></div>
        </form>
      </td>
@@ -203,7 +206,7 @@ if ($countUser >= $endList) {
 
 	// if end of list  or complete listing, do not show "next" button
 	if (!((($countUser-$startList)<=$endList) OR ($endList==2000))) {
-		$tool_content .= "<form method='post' action='$_SERVER[PHP_SELF]?startList=$startList&amp;numbList=more'>
+		$tool_content .= "<form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."?startList=$startList&amp;numbList=more'>
 		<div align='center'><input type='submit' value='$langFollow50 $endList >' name=numbering class='auth_input' /></div>
 		</form>";
 	}
@@ -211,7 +214,7 @@ if ($countUser >= $endList) {
      </td>
      <td valign='bottom' width='20%'>
        <div align='right'>
-       <form method='post' action='$_SERVER[PHP_SELF]?numbList=final'>
+       <form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."?numbList=final'>
          <input type='submit' value='$langEnd >>' name='numbering' class='auth_input' />
        </form>
        </div>
@@ -248,6 +251,9 @@ $tool_content .= "
    </tr>";
 
 if (isset($status) && ($status[$currentCourseID]==1 OR $status[$currentCourseID]==2)) {
+    $tool_content .= "</thead>\n";
+    $tokenedit = md5(uniqid(rand(), TRUE));
+    $_SESSION['tokenedit'] = $tokenedit;
 	$tool_content .= "
   <tr>
      <td class='UsersHead'>$langTutor</td>
@@ -261,9 +267,7 @@ $result = db_query("SELECT user.user_id, user.nom, user.prenom, user.email, user
 		LEFT JOIN `$currentCourseID`.user_group
 		ON user.user_id = user_group.user
 		WHERE `user`.`user_id` = `cours_user`.`user_id` AND `cours_user`.`cours_id` = $cours_id
-		ORDER BY nom, prenom LIMIT $startList, $endList", $db);
-
-$tool_content .= "</thead>\n";
+		ORDER BY nom, prenom LIMIT $startList, $endList", false);
 
 while ($myrow = mysql_fetch_array($result)) {
         // bi colored table
@@ -300,29 +304,66 @@ while ($myrow = mysql_fetch_array($result)) {
         // ************** tutor, admin and unsubscribe (admin only) ******************************
         if(isset($status) && ($status["$currentCourseID"]=='1' OR $status["$currentCourseID"]=='2')) {
                 // tutor right
+
                 if ($myrow['tutor'] == '0') {
-                        $tool_content .= "<td valign='top' align='center' class='add_user'><a href='$_SERVER[PHP_SELF]?giveTutor=$myrow[user_id]' title='$langGiveTutor'>$langAdd</a></td>";
+                        /*$tool_content .= "<td valign='top' align='center' class='add_user'><a href='".htmlspecialchars($_SERVER[PHP_SELF])."?giveTutor=$myrow[user_id]' title='$langGiveTutor'>$langAdd</a></td>";*/
+
+                        $tool_content .=  "<td valign='top' align='center' class='add_user'> <form title='$langGiveTutor' action='".htmlspecialchars($_SERVER[PHP_SELF])."?giveTutor=$myrow[user_id]' method=\"post\">";  //.htmlspecialchars($u).
+                        $tool_content .= "<input type=\"submit\" value=\"$langAdd\">";
+                        $tool_content .= "<input type=\"hidden\" name=\"tokenedit\" value=\"$tokenedit\" />";
+                        $tool_content .= "</form></td>";
+
                 } else {
-                        $tool_content .= "<td class='highlight' align='center'>$langTutor<br /><a href='$_SERVER[PHP_SELF]?removeTutor=$myrow[user_id]' title='$langRemoveRight'>$langRemove</a></td>";
+                        /*$tool_content .= "<td class='highlight' align='center'>$langTutor<br /><a href='".htmlspecialchars($_SERVER[PHP_SELF])."?removeTutor=$myrow[user_id]' title='$langRemoveRight'>$langRemove</a></td>";*/
+
+                        $tool_content .=  "<td class='highlight' align='center'>$langTutor<br /> <form action='".htmlspecialchars($_SERVER[PHP_SELF])."?removeTutor=$myrow[user_id]' title='$langRemoveRight' method=\"post\">";  //.htmlspecialchars($u).
+                        $tool_content .= "<input type=\"submit\" value=\"$langRemove\">";
+                        $tool_content .= "<input type=\"hidden\" name=\"tokenedit\" value=\"$tokenedit\" />";
+                        $tool_content .= "</form> </td>";
                 }
 
                 // admin right
                 if ($myrow['user_id'] != $_SESSION["uid"]) {
                         if ($myrow['statut']=='1') {
-                                $tool_content .= "<td class='highlight' align='center'>$langAdministrator<br /><a href='$_SERVER[PHP_SELF]?removeAdmin=$myrow[user_id]' title='$langRemoveRight'>$langRemove</a></td>";
+                                /*$tool_content .= "<td class='highlight' align='center'>$langAdministrator<br /><a href='".htmlspecialchars($_SERVER[PHP_SELF])."?removeAdmin=$myrow[user_id]' title='$langRemoveRight'>$langRemove</a></td>";*/
+
+                                $tool_content .=  "<td class='highlight' align='center'>$langAdministrator<br /> <form action='".htmlspecialchars($_SERVER[PHP_SELF])."?removeAdmin=$myrow[user_id]' title='$langRemoveRight' method=\"post\">";  //.htmlspecialchars($u).
+                                $tool_content .= "<input type=\"submit\" value=\"$langRemove\">";
+                                $tool_content .= "<input type=\"hidden\" name=\"tokenedit\" value=\"$tokenedit\" />";
+                                $tool_content .= "</form> </td>";
+
                         } else {
-                                $tool_content .= "<td valign='top' align='center' class='add_user'><a href='$_SERVER[PHP_SELF]?giveAdmin=$myrow[user_id]' title='$langGiveAdmin'>$langAdd</a></td>";
+                                /*$tool_content .= "<td valign='top' align='center' class='add_user'><a href='".htmlspecialchars($_SERVER[PHP_SELF])."?giveAdmin=$myrow[user_id]' title='$langGiveAdmin'>$langAdd</a></td>";*/
+
+                                $tool_content .=  "<td valign='top' align='center' class='add_user'> <form action='".htmlspecialchars($_SERVER[PHP_SELF])."?giveAdmin=$myrow[user_id]' title='$langGiveAdmin' method=\"post\">";  //.htmlspecialchars($u).
+                                $tool_content .= "<input type=\"submit\" value=\"$langAdd\">";
+                                $tool_content .= "<input type=\"hidden\" name=\"tokenedit\" value=\"$tokenedit\" />";
+                                $tool_content .= "</form> </td>";
                         }
                 } else {
                         if ($myrow['statut']=='1') {
                                 $tool_content .= "<td valign='top' class='highlight' align='center' title='$langAdmR'><b>$langAdministrator</b></td>";
                         } else {
-                                $tool_content .= "<td valign='top' align='center'><a href='$_SERVER[PHP_SELF]?giveAdmin=$myrow[user_id]'>$langGiveAdmin</a></td>";
+                                /*$tool_content .= "<td valign='top' align='center'><a href='".htmlspecialchars($_SERVER[PHP_SELF])."?giveAdmin=$myrow[user_id]'>$langGiveAdmin</a></td>";*/
+
+                                $tool_content .=  "<td valign='top' align='center'> <form action='".htmlspecialchars($_SERVER[PHP_SELF])."?giveAdmin=$myrow[user_id]' method=\"post\">";  //.htmlspecialchars($u).
+                                $tool_content .= "<input type=\"submit\" value=\"$langGiveAdmin\">";
+                                $tool_content .= "<input type=\"hidden\" name=\"tokenedit\" value=\"$tokenedit\" />";
+                                $tool_content .= "</form> </td>";
                         }
                 }
                 $tool_content .= "<td valign='top' align='center'>";
                 $alert_uname = $myrow['prenom'] . " " . $myrow['nom'];
-                $tool_content .= "<a href='$_SERVER[PHP_SELF]?unregister=$myrow[user_id]' onClick=\"return confirmation('".addslashes($alert_uname)."');\"><img src='../../template/classic/img/delete.gif' title='$langDelete' /></a>";
+                
+               
+                $tool_content .=  "<form method='post'  action=\"".htmlspecialchars($_SERVER[PHP_SELF])."?unregister=$myrow[user_id]\">";
+                //.htmlspecialchars($u).
+                $tool_content .= "<input type=\"image\" onClick=\"return confirmation('".addslashes($alert_uname)."');\"
+                                        src=\"../../template/classic/img/delete.gif\" border=\"0\" value='$langDelete'/>";
+                $tool_content .= "<input type=\"hidden\" name=\"tokenedit\" value=\"$tokenedit\" />";
+                $tool_content .= "</form>";
+
+                /*$tool_content .= "<a href='".htmlspecialchars($_SERVER[PHP_SELF])."?unregister=$myrow[user_id]' onClick=\"return confirmation('".addslashes($alert_uname)."');\"><img src='../../template/classic/img/delete.gif' title='$langDelete' /></a>";*/
         }	// admin only
         $tool_content .= "</td></tr>";$i++;
 } 	// end of while
@@ -337,7 +378,7 @@ if($countUser>=50) {
 	<table width='99%' >
 	<tr>
 	<td valign='bottom' align='left' width='20%'>
-	<form method='post' action='$_SERVER[PHP_SELF]?numbList=begin'>
+	<form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."?numbList=begin'>
 	<input type='submit' value='<< $langBegin' name='numbering' class='auth_input' />
 	</form>
 	</td>
@@ -345,25 +386,25 @@ if($countUser>=50) {
 	
 	if ($startList!=0) {
 		$tool_content .= "
-		<form method='post' action='$_SERVER[PHP_SELF]?startList=$startList&amp;numbList=less'>
+		<form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."?startList=$startList&amp;numbList=less'>
 		<input type='submit' value='< $langPreced50 $endList' name='numbering' class='auth_input' />
 		</form>";
 	}
 	$tool_content .= "</td>
 	<td valign='bottom' align='center' width='20%'>
-	<form method='post' action='".$_SERVER['PHP_SELF']."?startList=$startList&amp;numbList=all'>
+	<form method='post' action='".htmlspecialchars($_SERVER['PHP_SELF'])."?startList=$startList&amp;numbList=all'>
 		<input type='submit' value='$langAll' name='numbering' class='auth_input' />
 	</form>
 	</td>
 	<td valign='bottom' align='center' width='20%'>";
 	if (!((( $countUser-$startList ) <= 50) OR ($endList == 2000))) {
-		$tool_content .= "<form method='post' action='$_SERVER[PHP_SELF]?startList=$startList&amp;numbList=more'>
+		$tool_content .= "<form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."?startList=$startList&amp;numbList=more'>
 		<input type='submit' value='$langFollow50 $endList >' name='numbering' class='auth_input' />
 		</form>";
 	}
 	$tool_content .= "</td>
 	<td valign='bottom' align='right' width='20%'>
-	<form method='post' action='$_SERVER[PHP_SELF]?numbList=final'>
+	<form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."?numbList=final'>
 	<input type='submit' value='$langEnd >>' name='numbering' class='auth_input' />
 	</form>
 	</td></tr></table>";

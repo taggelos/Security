@@ -38,12 +38,15 @@ $tool_content = "";
 
 
 if (isset($_POST['submit'])) {
+	if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
 	foreach (array('temp' => 2, 'garbage' => 5, 'archive' => 1, 'tmpUnzipping' => 1) as $dir => $days) {
 		$tool_content .= sprintf("<p class=kk>$langCleaningUp</p>", $days,
 			($days == 1)? $langDaySing: $langDayPlur, $dir);
 		cleanup("${webDir}courses/$dir", $days);
 	}
-} else {
+}} else {
+	$token = md5(uniqid(rand(), TRUE));
+    $_SESSION['token'] = $token;
 	$tool_content .= "
     <table width='99%' class='FormData' align='left'>
     <tbody>
@@ -54,8 +57,9 @@ if (isset($_POST['submit'])) {
     <tr>
       <th width='220'>&nbsp;</th>
       <td>
-         <form method='post' action='$_SERVER[PHP_SELF]'>
+         <form method='post' action='".htmlspecialchars($_SERVER[PHP_SELF])."'>
 	     <input type='submit' name='submit' value='$langCleanup'>
+	     <input type=\"hidden\" name=\"token\" value=\"$token\" />
          </form>
       </td>
     </tr>

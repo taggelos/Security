@@ -134,7 +134,7 @@ $tool_content .= "<tr>
 <input type=\"submit\" name=\"search_submit\" value=\"$langSearch\">
 </td>
 </tr>";
-$tool_content .= "\n  </tbody>\n  </table>\n</form>";
+$tool_content .= "\n  </tbody>\n  </table>\n </form>";
 // end form
 
 $tool_content .= "<p>&nbsp;</p><p align=\"right\"><a href=\"index.php\">$langBack</a></p>";

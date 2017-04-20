@@ -54,9 +54,12 @@ if (!isset($urlSecure)) {
 }
 
 if (!isset($changePass)) {
+	$token = md5(uniqid(rand(), TRUE));
+    $_SESSION['token'] = $token;
 	$tool_content .= "
 <form method=\"post\" action=\"$passurl?submit=yes&changePass=do&userid=$userid\">
-  <table class=\"FormData\" width=\"99%\" align=\"left\">
+  <table class=\"FormData\" width=\"99%\" align=\"left\">  
+<input type=\"hidden\" name=\"token\" value=\"$token\" />
   <tbody>
   <tr>
     <th width=\"220\">&nbsp;</th>
@@ -80,6 +83,8 @@ if (!isset($changePass)) {
 }
 
 elseif (isset($submit) && isset($changePass) && ($changePass == "do")) {
+
+	if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
 	$userid = $_REQUEST['userid'];
 	if (empty($_REQUEST['password_form']) || empty($_REQUEST['password_form1'])) {
 		$tool_content .= mes($langFields, "", 'caution');
@@ -102,7 +107,7 @@ elseif (isset($submit) && isset($changePass) && ($changePass == "do")) {
 	$tool_content .= mes($langPassChanged, $langHome, 'success_small');
 	draw($tool_content, 3);
 	exit();
-}
+}}
 
 draw($tool_content, 3);
 // display message

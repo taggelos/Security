@@ -71,7 +71,7 @@ hContent;
 
 $titulaire_probable="$prenom $nom";
 
-$tool_content .= "<form method='post' name='createform' action='$_SERVER[PHP_SELF]' onsubmit=\"return checkrequired(this, 'intitule', 'titulaires');\">";
+$tool_content .= "<form method='post' name='createform' action='".htmlspecialchars($_SERVER[PHP_SELF])."' onsubmit=\"return checkrequired(this, 'intitule', 'titulaires');\">";
 
 // Import from BetaCMS Bridge
 doImportFromBetaCMSBeforeCourseCreation();
@@ -112,7 +112,6 @@ $tool_content .= $intitule_html .
                  $visit_html;
 
 if (isset($_POST['back1']) or !isset($_POST['visit'])) {
-
    // display form
 	$tool_content .= "<table width=\"99%\" align='left' class='FormData'>
 	<tbody>
@@ -154,7 +153,8 @@ if (isset($_POST['back1']) or !isset($_POST['visit'])) {
 	$tool_content .= lang_select_options('languageCourse');
 	$tool_content .= "</td><td>&nbsp;</td></tr>
 	<tr><th>&nbsp;</th>
-	<td><input type='submit' name='create2' value='$langNextStep >' /><input type='hidden' name='visit' value='true' /></td>
+	<td><input type='submit' name='create2' value='$langNextStep >' />
+		 <input type='hidden' name='visit' value='true' /></td>
 	<td><p align='right'><small>(*) &nbsp;$langFieldsRequ</small></p></td>
 </tbody>
 </table><br />";
@@ -199,6 +199,8 @@ if (isset($_POST['back1']) or !isset($_POST['visit'])) {
 	<br />";
 
 }  elseif (isset($_POST['create3']) or isset($_POST['back2'])) {
+	$token = md5(uniqid(rand(), TRUE));
+    $_SESSION['token'] = $token;
 	$nameTools = $langCreateCourse . " (" . $langCreateCourseStep." 3 " .$langCreateCourseStep2 . " 3 )" ;
 	@$tool_content .= "
 	<table width=\"99%\" align='left' class='FormData'>
@@ -324,7 +326,9 @@ if (isset($_POST['back1']) or !isset($_POST['visit'])) {
 	<tr>
 	<th>&nbsp;</th>
 	<td width='400'><input type='submit' name='back2' value='< $langPreviousStep '>&nbsp;
-	<input type='submit' name='create_course' value=\"$langFinalize\"></td>
+	<input type='submit' name='create_course' value=\"$langFinalize\">
+	<input type='hidden' name='token' value='$token' />
+	</td>
 	<td><p align='right'><small>$langFieldsOptionalNote</small></p></td>
 	</tr>
 	</tbody>
@@ -333,7 +337,7 @@ if (isset($_POST['back1']) or !isset($_POST['visit'])) {
 
 // create the course and the course database
 if (isset($_POST['create_course'])) {
-
+		if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
         $nameTools = $langCourseCreate;
         $facid = intval($faculte);
         $facname = find_faculty_by_id($facid);
@@ -430,7 +434,7 @@ if (isset($_POST['create_course'])) {
                 <p class=\"success_small\">$langJustCreated: &nbsp;<b>$intitule</b></p>
                 <p><small>$langEnterMetadata</small></p><br />
                 <p align='center'>&nbsp;<a href='../../courses/$repertoire/index.php' class=mainpage>$langEnter</a>&nbsp;</p>";
-} // end of submit
+} }// end of submit
 
 $tool_content .= "</form>";
 

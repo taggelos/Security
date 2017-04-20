@@ -66,8 +66,22 @@ $tool_content = "";
 /*****************************************************************************
 		MAIN BODY
 ******************************************************************************/
+
+function randomPassword($num) {
+    $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    $pass = array(); //remember to declare $pass as an array
+    $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+    for ($i = 0; $i < $num; $i++) {
+        $n = rand(0, $alphaLength);
+        $pass[] = $alphabet[$n];
+    }
+    return implode($pass); //turn the array into a string
+}
+
+
 // Save new config.php
 if (isset($submit))  {
+  if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
 	// Make config directory writable
 	@chmod( "../../config",777 );
 	@chmod( "../../config", 0777 );
@@ -147,9 +161,12 @@ $durationAccount = "'.$_POST['formdurationAccount'].'";
 	// Display link to go back to index.php
 	$tool_content .= "<center><p><a href=\"index.php\">".$langBack."</a></p></center>";
 
-}
+}}
 // Display config.php edit form
 else {
+
+  $token = md5(uniqid(rand(), TRUE));
+  $_SESSION['token'] = $token;
 	$titleextra = "config.php";
 	// Check if restore has been selected
 	if (isset($restore) && $restore=="yes") {
@@ -159,7 +176,8 @@ else {
 	}
 	// Constract the form
 	$tool_content .= "
-    <form action=\"".$_SERVER['PHP_SELF']."\" method=\"post\">";
+    <form action=\"".htmlspecialchars($_SERVER['PHP_SELF'])."\" method=\"post\">";
+  $tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" />";
 	$tool_content .= "
 
   <table class=\"FormData\" width=\"99%\" align=\"left\">
@@ -193,7 +211,7 @@ else {
   </tr>
   <tr>
     <th class=\"left\"><b>\$mysqlPassword:</b></th>
-    <td><input class=\"FormData_InputText\" type=\"password\" name=\"formmysqlPassword\" size=\"40\" value=\"".$mysqlPassword."\"></td>
+    <td><input class=\"FormData_InputText\" type=\"password\" name=\"formmysqlPassword\" size=\"40\" value=\"".randomPassword(strlen($mysqlPassword))."\"> Change your password by rewriting it from scratch! </td>
   </tr>
   <tr>
     <th class=\"left\"><b>\$mysqlMainDb:</b></th>

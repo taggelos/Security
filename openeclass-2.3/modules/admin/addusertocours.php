@@ -50,6 +50,7 @@ if (isset($search) && ($search=="yes")) {
 }
 // Register - Unregister students - professors to course
 if (isset($_POST['submit']))  {
+  if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
         $regstuds = isset($_POST['regstuds'])? array_map('intval', $_POST['regstuds']): array();
         $regprofs = isset($_POST['regprofs'])? array_map('intval', $_POST['regprofs']): array();
         $reglist = implode(', ', array_merge($regstuds, $regprofs));
@@ -77,9 +78,12 @@ if (isset($_POST['submit']))  {
 
 	$tool_content .= "<p>".$langQuickAddDelUserToCoursSuccess."</p>";
 
-}
+}}
 // Display form to manage users
 else {
+
+	$token = md5(uniqid(rand(), TRUE));        
+ 	$_SESSION['token'] = $token;
 	// Some javascript is needed
 	$tool_content .= '<script type="text/javascript">
 function move(fbox, tbox) {
@@ -137,8 +141,7 @@ function reverseAll(cbList) {
 }
 
 </script>';
-
-	$tool_content .= "<form action=".$_SERVER['PHP_SELF']."?c=".htmlspecialchars($_GET['c'])."".$searchurl." method='post'>";
+	$tool_content .= "<form action=".htmlspecialchars($_SERVER['PHP_SELF'])."?c=".htmlspecialchars($_GET['c'])."".$searchurl." method='post'> ";
 	$tool_content .= "<table class='FormData' width='99%' align='left'><tbody>
                           <tr><th colspan='3'>".$langFormUserManage."</th></tr>
                           <tr><th align=left>".$langListNotRegisteredUsers."<br />
@@ -217,7 +220,7 @@ function reverseAll(cbList) {
 		<td><input type=submit value=\"".$langAcceptChanges."\" name=\"submit\" onClick=\"selectAll(this.form.elements[5],this.form.elements[6],true)\"></td>
 		<td>&nbsp;</td>
 		</tr></tbody></table>";
-	$tool_content .= "</form>";
+	$tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" /></form>";
 
 }
 // If course selected go back to editcours.php

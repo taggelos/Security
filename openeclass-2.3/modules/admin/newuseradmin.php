@@ -51,6 +51,8 @@ $submit = isset($_POST['submit'])?$_POST['submit']:'';
 
 if($submit) {
 	// register user
+	
+	if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
 	$depid = intval(isset($_POST['department'])?$_POST['department']: 0);
 	$proflanguage = isset($_POST['language'])?$_POST['language']:'';
 	if (!isset($native_language_names[$proflanguage])) {
@@ -65,13 +67,13 @@ if($submit) {
 	// check if there are empty fields
 	if (!$all_set) {
 		$tool_content .= "<p class='caution_small'>$langEmptyFields</p>
-			<br><br><p align='right'><a href='$_SERVER[PHP_SELF]'>$langAgain</a></p>";
+			<br><br><p align='right'><a href='".htmlspecialchars($_SERVER[PHP_SELF])."'>$langAgain</a></p>";
 	} elseif ($user_exist) {
 		$tool_content .= "<p class='caution_small'>$langUserFree</p>
-			<br><br><p align='right'><a href='$_SERVER[PHP_SELF]'>$langAgain</a></p>";
+			<br><br><p align='right'><a href='".htmlspecialchars($_SERVER[PHP_SELF])."'>$langAgain</a></p>";
 	} elseif(!email_seems_valid($email_form)) {
 		$tool_content .= "<p class='caution_small'>$langEmailWrong.</p>
-			<br><br><p align='right'><a href='$_SERVER[PHP_SELF]'>$langAgain</a></p>";
+			<br><br><p align='right'><a href='".htmlspecialchars($_SERVER[PHP_SELF])."'>$langAgain</a></p>";
 	} else {
                 $registered_at = time();
 		$expires_at = time() + $durationAccount;
@@ -122,7 +124,7 @@ $langEmail : $emailhelpdesk
 
         }
 
-} else {
+}} else {
         $lang = false;
 	if (isset($id)) { // if we come from prof request
 		$res = mysql_fetch_array(db_query("SELECT profname, profsurname, profuname, profemail, proftmima, comment, lang, statut 
@@ -148,8 +150,10 @@ $langEmail : $emailhelpdesk
                 $nameTools = $langProfReg;
                 $title = $langNewProf;
         }
-
-	$tool_content .= "<form action='$_SERVER[PHP_SELF]' method='post'>
+    $token = md5(uniqid(rand(), TRUE));
+    $_SESSION['token'] = $token;
+	$tool_content .= "<form action='".htmlspecialchars($_SERVER[PHP_SELF])."' method='post'>
+	<input type=\"hidden\" name=\"token\" value=\"$token\" />
 	<table width='99%' align='left' class='FormData'>
 	<tbody><tr>
 	<th width='220'>&nbsp;</th>

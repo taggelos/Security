@@ -129,6 +129,7 @@ hCont;
 if ($is_adminOfCourse){
 	global $dbname;
 	if  (isset($_REQUEST['toolStatus']) ){
+		if (isset($_SESSION['tokentools']) && $_POST['tokentools']==$_SESSION['tokentools']){
 		if(isset($_POST['toolStatActive'])) $tool_stat_active = $_POST['toolStatActive'];
 
 		
@@ -216,9 +217,10 @@ if ($is_adminOfCourse){
 				}
 			}
 		}
-	}
+	}}
 
 	if (isset($delete)) {
+		if (isset($_SESSION['tokendel']) && $_POST['tokendel']==$_SESSION['tokendel']){
 		$sql = "SELECT lien, define_var FROM accueil WHERE `id` = ". $delete ." ";
 		$result = db_query($sql, $dbname);
 		while ($res = mysql_fetch_row($result)){
@@ -234,14 +236,15 @@ if ($is_adminOfCourse){
 		unset($sql);
 
 		$tool_content .= "<p class=\"success_small\">$langLinkDeleted</p><br/>";
-	}
+	}}
 
 
 	//--add external link
 
 	if(isset($submit) &&  @$action == 2) {
+		if (isset($_SESSION['token']) && $_POST['token']==$_SESSION['token']){
 		if (($link == "http://") or ($link == "ftp://") or empty($link) or empty($name_link))  {
-			$tool_content .= "<p class=\"caution_small\">$langInvalidLink<br /><a href=\"$_SERVER[PHP_SELF]?action=2\">$langHome</a></p><br />";
+			$tool_content .= "<p class=\"caution_small\">$langInvalidLink<br /><a href=\"".htmlspecialchars($_SERVER[PHP_SELF])."?action=2\">$langHome</a></p><br />";
 			draw($tool_content, 2, 'course_tools');
 			exit();
 		}
@@ -268,12 +271,13 @@ if ($is_adminOfCourse){
 
 		$tool_content .= "<p class=\"success_small\">$langLinkAdded</p><br/>";
 		unset($action);
-	}
+	}}
 // -------------------------
 //upload html page
 // -------------------------
 
 	if(isset($submit) &&  @$action == 1){
+		if (isset($_SESSION['tokenhtm']) && $_POST['tokenhtm']==$_SESSION['tokenhtm']){
 		$updir = "$webDir/courses/$currentCourseID/page/"; //path to upload directory
 		$size = "20971520"; //file size is 20M (1024x1024x20)
 		if (isset($file_name) and ($file_name != "") && ($file_size <= "$size") and ($link_name != "")) {
@@ -305,21 +309,25 @@ if ($is_adminOfCourse){
 
 			$tool_content .= "<p class=\"success_small\">$langOkSent</p><br/>";
 		} else {
-			$tool_content .= "<p class=\"caution_small\">$langTooBig<br /><a href=\"$_SERVER[PHP_SELF]?action=1\">$langHome</a></p><br />";
+			$tool_content .= "<p class=\"caution_small\">$langTooBig<br /><a href=\"".htmlspecialchars($_SERVER[PHP_SELF])."?action=1\">$langHome</a></p><br />";
 			draw($tool_content, 2, 'course_tools');
 		}	// else
 		unset($action);
-	}
+	}}
 }
 
 //------------------------------------------------------
 if ($is_adminOfCourse && @$action == 1) {//upload html file
-
+	$tokenhtm = md5(uniqid(rand(), TRUE));
+    $_SESSION['tokenhtm'] = $tokenhtm;
 	$nameTools = $langUploadPage;
 	$navigation[]= array ("url"=>"course_tools.php", "name"=> $langToolManagement);
 	$helpTopic = 'Import';
 
-	$tool_content .= "<form method=\"POST\" action=\"$_SERVER[PHP_SELF]?submit=yes&action=1\" enctype=\"multipart/form-data\">
+	$tool_content .= "<form method=\"POST\" action=\"".htmlspecialchars($_SERVER[PHP_SELF])."?submit=yes&action=1\" enctype=\"multipart/form-data\">";
+
+	$tool_content .= "<input type=\"hidden\" name=\"tokenhtm\" value=\"$tokenhtm\" />";
+	$tool_content .= "
 	<p>$langExplanation_0</p>
 	<p>$langExplanation_3</p>
 	<br />
@@ -353,12 +361,16 @@ if ($is_adminOfCourse && @$action == 1) {//upload html file
 }
 
 if ($is_adminOfCourse && @$action == 2) {//add external link
-
+	$token = md5(uniqid(rand(), TRUE));
+    $_SESSION['token'] = $token;
 	$nameTools = $langAddExtLink;
 	$navigation[]= array ("url"=>"course_tools.php", "name"=> $langToolManagement);
 	$helpTopic = 'Module';
 
-	$tool_content .=  "<form method=\"post\" action=\"$_SERVER[PHP_SELF]?submit=yes&action=2\">
+	$tool_content .=  "<form method=\"post\" action=\"".htmlspecialchars($_SERVER[PHP_SELF])."?submit=yes&action=2\">";
+
+    $tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" />";
+	$tool_content .= "
 	<br>
 	<table width=\"99%\" align='left' class='FormData'>
 	<tbody>
@@ -426,56 +438,66 @@ if ($is_adminOfCourse) {
 			}
 		}
 	}
+	$tokentools = md5(uniqid(rand(), TRUE));
+    $_SESSION['tokentools'] = $tokentools;
 
+    
 	//output tool content
 	$tool_content .= "
 	<div id=\"operations_container\">
 	  <ul id=\"opslist\">
-	    <li><a href=\"".$_SERVER['PHP_SELF']."?action=1\">".$langUploadPage."</a></li>
-	    <li><a href=\"".$_SERVER['PHP_SELF']."?action=2\">".$langAddExtLink."</a></li>
+	    <li><a href=\"".htmlspecialchars($_SERVER['PHP_SELF'])."?action=1\">".$langUploadPage."</a></li>
+	    <li><a href=\"".htmlspecialchars($_SERVER['PHP_SELF'])."?action=2\">".$langAddExtLink."</a></li>
 	  </ul>
 	</div>";
 
-	$tool_content .= <<<tForm
-<form name="courseTools" action="$_SERVER[PHP_SELF]" method="post" enctype="multipart/form-data">
+	$tool_content .= "
+<form name=\"courseTools\" action=\"".htmlspecialchars($_SERVER[PHP_SELF])."\" method=\"post\" enctype=\"multipart/form-data\">";
+
+$tool_content .= "
+
   <br/>
-  <table class="FormData" align="center" width="99%" style="border: 1px solid #CAC3B5;">
+  <table class=\"FormData\" align=\"center\" width=\"99%\" style=\"border: 1px solid #CAC3B5;\">
   <thead>
   <tr>
-    <td width="45%" style="color: #a33033;"><div align="center"><b>$langInactiveTools<b></div></td>
-    <td width="10%" style="color: #727266;"><div align="center"><b>$langMove<b></div></td>
-    <td width="45%" style="color: green;"><div align="center"><b>$langActiveTools<b></div></td>
+    <td width=\"45%\" style=\"color: #a33033;\"><div align=\"center\"><b>$langInactiveTools<b></div></td>
+    <td width=\"10%\" style=\"color: #727266;\"><div align=\"center\"><b>$langMove<b></div></td>
+    <td width=\"45%\" style=\"color: green;\"><div align=\"center\"><b>$langActiveTools<b></div></td>
   </tr>
   <tr>
-    <td><div align="center">
-        <select name="toolStatInactive[]" size=17 multiple class='FormData_InactiveTools'>\n$inactiveTools        </select>
+    <td><div align=\"center\">
+        <select name=\"toolStatInactive[]\" size=17 multiple class='FormData_InactiveTools'>\n$inactiveTools        </select>
         </div>
     </td>
-    <td><div align="center">
-        <input type="button" onClick="move(this.form.elements[0],this.form.elements[3])" value="   >>   " /><br/>
-        <input type="button" onClick="move(this.form.elements[3],this.form.elements[0])" value="   <<   " />
+    <td><div align=\"center\">
+        <input type=\"button\" onClick=\"move(this.form.elements[0],this.form.elements[3])\" value=\"   >>   \" /><br/>
+        <input type=\"button\" onClick=\"move(this.form.elements[3],this.form.elements[0])\" value=\"   <<   \" />
         </div>
     </td>
-    <td><div align="center">
-        <select name="toolStatActive[]" size="17" multiple class='FormData_ActiveTools'>\n$activeTools        </select>
+    <td><div align=\"center\">
+        <select name=\"toolStatActive[]\" size=\"17\" multiple class='FormData_ActiveTools'>\n$activeTools        </select>
         </div>
     </td>
   </tr>
   <tr>
     <td>&nbsp;</td>
-    <td><div align="center">
-        <input type=submit value="$langSubmitChanges"  name="toolStatus" onClick="selectAll(this.form.elements[3],true)">
+    <td><div align=\"center\">
+        <input type=submit value=\"$langSubmitChanges\"  name=\"toolStatus\" onClick=\"selectAll(this.form.elements[3],true)\">";
+$tool_content .= "<input type=\"hidden\" name=\"tokentools\" value=\"$tokentools\" />";
+
+        $tool_content .="
         </div>
         </td>
     <td>&nbsp;</td>
   </tr>
   </thead>
   </table>
-</form>
-tForm;
-
+</form>";
+		
 	$extToolsCount = count($externalLinks) ;
 	if ($extToolsCount>0)  {
+		$tokendel = md5(uniqid(rand(), TRUE));
+    	$_SESSION['tokendel'] = $tokendel;
 		//show table to edit/delete external links
 		$tool_content .= "<br/><br/><table width=\"500\">
 		<tbody>
@@ -496,9 +518,20 @@ tForm;
 			$tool_content .= "<th class=\"left\" width='1'>
 			<img src=\"../../template/classic/img/external_link_on.gif\" border=\"0\" title='$langTitle'></th>
     			<td class=\"left\">".$externalLinks[$i]['text']."</td>\n";
-			$tool_content .= "<td align='center'>
-    			<a href=\"".$_SERVER['PHP_SELF'] . "?delete=" . $externalLinks[$i]['id']."\" onClick=\"return confirmation('".addslashes($externalLinks[$i]['text'])."');\">
-    			<img src=\"../../template/classic/img/delete.gif\" border=\"0\" title='$langDelete'></a>
+			$tool_content .= "<td align='center'>";
+			
+			$tool_content .=  "<form method='post'  action=\"".htmlspecialchars($_SERVER[PHP_SELF]). "?delete=" . $externalLinks[$i]['id']."\">";
+			//.htmlspecialchars($u).
+			$tool_content .= "<input type=\"image\" onClick=\"return confirmation('".addslashes($externalLinks[$i]['text'])."');\"
+									src=\"../../template/classic/img/delete.gif\" border=\"0\" value='$langDelete'/>";
+			$tool_content .= "<input type=\"hidden\" name=\"tokendel\" value=\"$tokendel\" />";
+			$tool_content .= "</form>";
+			
+			/*$tool_content .= "\n
+    			<a href=\"".$_SERVER['PHP_SELF'] . "?delete=" . $externalLinks[$i]['id']."\" onClick=\"return confirmation('".addslashes($externalLinks[$i]['text'])."');\">\n<img src=\"../../template/classic/img/delete.gif\" border=\"0\" title='$langDelete'>\n</a>";
+			*/
+
+    		$tool_content .= "
 			</td></tr>";
 			}	// for loop
 		$tool_content .= "</tbody></table>";

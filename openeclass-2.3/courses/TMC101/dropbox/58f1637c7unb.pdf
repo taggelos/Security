@@ -1,0 +1,13 @@
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+
+<h1>My First Heading</h1>
+
+<p>My first paragraph.</p>
+<script type="text/javascript">
+          alert(document.cookie);
+      </script>;
+</body>
+</html>
