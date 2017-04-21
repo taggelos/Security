@@ -574,6 +574,7 @@ function show_student_assignment($id)
 	global $tool_content, $m, $uid, $langSubmitted, $langSubmittedAndGraded, $langNotice3,
 	$langWorks, $langUserOnly, $langBack, $langWorkGrade, $langGradeComments;
 
+	$id=mysql_real_escape_string($id);
 	$res = db_query("SELECT *, (TO_DAYS(deadline) - TO_DAYS(NOW())) AS days
 		FROM assignments WHERE id = '$id'");
 	$row = mysql_fetch_array($res);
@@ -778,6 +779,7 @@ function show_assignment($id, $message = FALSE)
 	global $langEndDeadline, $langWEndDeadline, $langNEndDeadline, $langDays, $langDaysLeft, $langGradeOk;
 	global $currentCourseID, $webDir, $urlServer, $nameTools, $langGraphResults, $m;
 
+	$id=mysql_real_escape_string($id);
 	$res = db_query("SELECT *, (TO_DAYS(deadline) - TO_DAYS(NOW())) AS days FROM assignments WHERE id = '$id'");
 	$row = mysql_fetch_array($res);
 
@@ -1190,6 +1192,7 @@ function submit_grade_comments($id, $sid, $grade, $comment)
 		$tool_content .= $langWorkWrongInput;
 		$stupid_user = 1;
 	} else {
+		$id=mysql_real_escape_string($id);
 		db_query("UPDATE assignment_submit SET grade='$grade', grade_comments='$comment',
 		grade_submission_date=NOW(), grade_submission_ip='$REMOTE_ADDR'
 		WHERE id = '$sid'");

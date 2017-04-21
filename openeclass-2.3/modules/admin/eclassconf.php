@@ -61,7 +61,7 @@ include '../../include/baseTheme.php';
 $nameTools = $langEclassConf;
 $navigation[] = array("url" => "index.php", "name" => $langAdmin);
 // Initialise $tool_content
-$tool_content = "";
+$tool_content ="";
 
 /*****************************************************************************
 		MAIN BODY
@@ -105,9 +105,11 @@ if (isset($submit))  {
                         $user_reg = 'TRUE';
                 }
                 if (defined('UTF8')) {
-                        $utf8define = "define('UTF8', true);";
+                        $utf8define ="define('UTF8', true);";
                 }
-
+if($_SESSION['myrandom']==$_POST['formmysqlPassword']){
+      $_POST['formmysqlPassword'] = $mysqlPassword;
+}
 		// Prepare config.php content
 		$stringConfig='<?php
 /*===========================================================================
@@ -120,46 +122,46 @@ if (isset($submit))  {
 */
 
 '.$utf8define.'
-$urlServer	=	"'.$_POST['formurlServer'].'";
-$urlAppend	=	"'.$_POST['formurlAppend'].'";
-$webDir		=	"'.str_replace("\\","/",realpath($_POST['formwebDir'])."/").'" ;
+$urlServer	=\''.addslashes($_POST['formurlServer']).'\';
+$urlAppend	=\''.addslashes($_POST['formurlAppend']).'\';
+$webDir	=\''.addslashes(str_replace("\\","/",realpath($_POST['formwebDir'])."/")).'\';
 
-$mysqlServer="'.$_POST['formmysqlServer'].'";
-$mysqlUser="'.$_POST['formmysqlUser'].'";
-$mysqlPassword="'.$_POST['formmysqlPassword'].'";
-$mysqlMainDb="'.$_POST['formmysqlMainDb'].'";
-$phpMyAdminURL="'.$_POST['formphpMyAdminURL'].'";
-$phpSysInfoURL="'.$_POST['formphpSysInfoURL'].'";
-$emailAdministrator="'.$_POST['formemailAdministrator'].'";
-$administratorName="'.$_POST['formadministratorName'].'";
-$administratorSurname="'.$_POST['formadministratorSurname'].'";
-$siteName="'.$_POST['formsiteName'].'";
+$mysqlServer=\''.addslashes($_POST['formmysqlServer']).'\';
+$mysqlUser=\''.addslashes($_POST['formmysqlUser']).'\';
+$mysqlPassword=\''.addslashes($_POST['formmysqlPassword']).'\';
+$mysqlMainDb=\''.addslashes($_POST['formmysqlMainDb']).'\';
+$phpMyAdminURL=\''.addslashes($_POST['formphpMyAdminURL']).'\';
+$phpSysInfoURL=\''.addslashes($_POST['formphpSysInfoURL']).'\';
+$emailAdministrator=\''.addslashes($_POST['formemailAdministrator']).'\';
+$administratorName=\''.addslashes($_POST['formadministratorName']).'\';
+$administratorSurname=\''.addslashes($_POST['formadministratorSurname']).'\';
+$siteName=\''.addslashes($_POST['formsiteName']).'\';
 
-$telephone="'.$_POST['formtelephone'].'";
-$emailhelpdesk="'.$_POST['formemailhelpdesk'].'";
-$Institution="'.$_POST['formInstitution'].'";
-$InstitutionUrl="'.$_POST['formInstitutionUrl'].'";
+$telephone=\''.addslashes($_POST['formtelephone']).'\';
+$emailhelpdesk=\''.addslashes($_POST['formemailhelpdesk']).'\';
+$Institution=\''.addslashes($_POST['formInstitution']).'\';
+$InstitutionUrl=\''.addslashes($_POST['formInstitutionUrl']).'\';
 
 // available: greek and english
-$language = "'.$_POST['formlanguage'].'";
+$language =\''.addslashes($_POST['formlanguage']).'\';
 
-$postaddress = "'.$_POST['formpostaddress'].'";
-$fax = "'.$_POST['formfax'].'";
+$postaddress =\''.addslashes($_POST['formpostaddress']).'\';
+$fax =\''.addslashes($_POST['formfax']).'\';
 
 $close_user_registration = '.$user_reg.';
-$encryptedPasswd = "true";
+$encryptedPasswd ="true";
 $persoIsActive = TRUE;
 
-$durationAccount = "'.$_POST['formdurationAccount'].'";
+$durationAccount =\''.addslashes($_POST['formdurationAccount']).'\';
 ';
 	// Save new config.php
 	fwrite($fd, $stringConfig);
 	// Display result message
-	$tool_content .= "<p>".$langFileUpdatedSuccess."</p>";
+	$tool_content .="<p>".$langFileUpdatedSuccess."</p>";
 
 }
 	// Display link to go back to index.php
-	$tool_content .= "<center><p><a href=\"index.php\">".$langBack."</a></p></center>";
+	$tool_content .="<center><p><a href=\"index.php\">".$langBack."</a></p></center>";
 
 }}
 // Display config.php edit form
@@ -167,18 +169,18 @@ else {
 
   $token = md5(uniqid(rand(), TRUE));
   $_SESSION['token'] = $token;
-	$titleextra = "config.php";
+	$titleextra ="config.php";
 	// Check if restore has been selected
 	if (isset($restore) && $restore=="yes") {
 		// Substitute variables with those from backup file
-		$titleextra = " ($langRestoredValues)";
+		$titleextra =" ($langRestoredValues)";
 		@include("../../config/config_backup.php");
 	}
 	// Constract the form
-	$tool_content .= "
+	$tool_content .="
     <form action=\"".htmlspecialchars($_SERVER['PHP_SELF'])."\" method=\"post\">";
-  $tool_content .= "<input type=\"hidden\" name=\"token\" value=\"$token\" />";
-	$tool_content .= "
+  $tool_content .="<input type=\"hidden\" name=\"token\" value=\"$token\" />";
+	$tool_content .="
 
   <table class=\"FormData\" width=\"99%\" align=\"left\">
   <tbody>
@@ -211,13 +213,20 @@ else {
   </tr>
   <tr>
     <th class=\"left\"><b>\$mysqlPassword:</b></th>
-    <td><input class=\"FormData_InputText\" type=\"password\" name=\"formmysqlPassword\" size=\"40\" value=\"".randomPassword(strlen($mysqlPassword))."\"> Change your password by rewriting it from scratch! </td>
+    <td><input class=\"FormData_InputText\" type=\"password\" name=\"formmysqlPassword\" size=\"40\" value=\"";
+
+
+    $_SESSION['myrandom'] =  randomPassword(strlen($mysqlPassword));
+
+    $tool_content .= $_SESSION['myrandom'];
+
+    $tool_content .="\"> </td>
   </tr>
   <tr>
     <th class=\"left\"><b>\$mysqlMainDb:</b></th>
     <td><input class=\"FormData_InputText\" type=\"text\" name=\"formmysqlMainDb\" size=\"40\" value=\"".$mysqlMainDb."\"></td>
   </tr>";
-	$tool_content .= "  <tr>
+	$tool_content .="  <tr>
     <th class=\"left\"><b>\$phpMyAdminURL:</b></th>
     <td><input class=\"FormData_InputText\" type=\"text\" name=\"formphpMyAdminURL\" size=\"40\" value=\"".$phpMyAdminURL."\"></td>
   </tr>
@@ -272,13 +281,13 @@ else {
     <td colspan=\"2\">&nbsp;</td>
   </tr>";
 	if ($language=="greek") {
-		$grSel = "selected";
-		$enSel = "";
+		$grSel ="selected";
+		$enSel ="";
 	} else {
-		$grSel = "";
-		$enSel = "selected";
+		$grSel ="";
+		$enSel ="selected";
 	}
-	$tool_content .= "
+	$tool_content .="
   <tr>
     <th class=\"left\"><b>\$language:</b></th>
     <td><select name=\"formlanguage\">
@@ -288,14 +297,14 @@ else {
   </tr>";
 
 if ($close_user_registration=="true") {
-    $close_user_registrationSelTrue = "selected";
-    $close_user_registrationSelFalse = "";
+    $close_user_registrationSelTrue ="selected";
+    $close_user_registrationSelFalse ="";
   } else {
-    $close_user_registrationSelTrue = "";
-    $close_user_registrationSelFalse = "selected";
+    $close_user_registrationSelTrue ="";
+    $close_user_registrationSelFalse ="selected";
   }
 
-$tool_content .= "
+$tool_content .="
   <tr>
     <th class=\"left\"><b>\$close_user_registration:</b></th>
     <td><select name=\"formcloseuserregistration\">
@@ -304,12 +313,12 @@ $tool_content .= "
     </select></td>
 </tr>";
 
-$tool_content .= "
+$tool_content .="
   <tr>
     <th class=\"left\"><b>\$durationAccount:</b></th>
     <td><input type=\"text\" name=\"formdurationAccount\" size=\"40\" value=\"".$durationAccount."\"></td>
 </tr>";
-$tool_content .= "
+$tool_content .="
   <tr>
     <th class=\"left\"><b>\$encryptedPasswd:</b></th>
     <td><input type=\"checkbox\" checked disabled> ".$langencryptedPasswd."</td>
@@ -331,7 +340,7 @@ $tool_content .= "
 	// Check if a backup file exists
   if (file_exists("../../config/config_backup.php")) {
   	// Give option to restore values from backup file
-  	$tool_content .= "
+  	$tool_content .="
   <table class=\"FormData\" width=\"99%\" align=\"left\">
   <tbody>
   <tr>
@@ -342,7 +351,7 @@ $tool_content .= "
   </table>";
 	}
 	// Display link to index.php
-	$tool_content .= "
+	$tool_content .="
     <br>
     <p align=\"right\"><a href=\"index.php\">".$langBack."</a></p>";
 	// After restored values have been inserted into form then bring back
